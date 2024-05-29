@@ -1,0 +1,82 @@
+﻿
+@model dynamic
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+
+
+
+
+<script type="text/javascript">
+    var itemIndex = 1; // Початковий індекс для доданих товарів
+
+    function createNewElement() {
+        // Створення нового DIV елемента
+        var txtNewInputBox = document.createElement('div');
+
+        // Додавання вмісту (нового input box)
+        txtNewInputBox.innerHTML = `
+                <div class="form-group">
+                    <select name="Items[${itemIndex}].Id" class="select_item_to_sell">
+                        <option></option>
+    @foreach (var item in Model.Items)
+    {
+                                <option value="@item.Id">
+            @item.Name - @item.Price грн - @item.Available @item.Unit
+                                </option>
+    }
+                    </select>
+                    <input type="number" name="Items[${itemIndex}].Quantity" step="1" min="1" max="50" value="1"/>
+                </div>`;
+
+        document.getElementById("inputFields").appendChild(txtNewInputBox);
+        itemIndex++; // Збільшення індексу для наступного елемента
+    }
+</script>
+
+<h1>Create</h1>
+
+<h4>Check</h4>
+<hr />
+<div class="row" id="row">
+    <form asp-action="Create">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div id="inputFields">
+            <div class="form-group">
+                <select name="Items[0].Id" class="select_item_to_sell">
+                    <option></option>
+                    @foreach (var item in Model.Items)
+                    {
+                        <option value="@item.Id">
+                            @item.Name - @item.Price грн - @item.Available @item.Unit
+                        </option>
+                    }
+                </select>
+                <input type="number" name="Items[0].Quantity" step="1" min="1" max="50" value="1" />
+            </div>
+        </div>
+
+        <button type="submit">Submit</button>
+    </form>
+    <div id="dynamicCheck">
+        <input type="button" value="Додати" onclick="createNewElement();" />
+    </div>
+</div>
+    
+      
+        <div class="sum">
+            <p>Усього:</p>
+            <input type="number" readonly value="82" />
+            
+        </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

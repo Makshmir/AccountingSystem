@@ -1,5 +1,6 @@
 ﻿using AccountingSystem.Models;
 using AccountingSystem.Services;
+using IronBarCode;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,9 +20,17 @@ namespace AccountingSystem.Controllers
             return View(itemService.Get());
         }
 
+
+
+
+
+
+
+
         // GET: itemsController/Details/5
         public ActionResult Details(string id)
         {
+
             if (id == null)
             {
                 return NotFound();
@@ -46,6 +55,8 @@ namespace AccountingSystem.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(Item item)
         {
+            item.MarkupPriceNumeric = Math.Round((item.Price - item.PurchPrice), 2);
+            item.MarkupPriceInterest=Math.Round((item.Price / item.PurchPrice-1)*100);
             itemService.Create(item);
             return RedirectToAction(nameof(Index));
         }

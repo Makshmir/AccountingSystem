@@ -418,7 +418,7 @@ legend + * {
 ::-webkit-datetime-edit-hour-field,
 ::-webkit-datetime-edit-day-field,
 ::-webkit-datetime-edit-month-field,
-::-webkit-datetime-edit-year-field {
+::-webkit-datetime-edit-Available-field {
   padding: 0;
 }
 
