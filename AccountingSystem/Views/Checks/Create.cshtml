@@ -13,68 +13,98 @@
     var itemIndex = 1; // Початковий індекс для доданих товарів
 
     function createNewElement() {
-        // Створення нового DIV елемента
+        var lastSelect = document.querySelector('.select_item_to_sell:last-of-type');
+
+        if (lastSelect.value.trim() === '') {
+            return; 
+        }
+
         var txtNewInputBox = document.createElement('div');
 
-        // Додавання вмісту (нового input box)
         txtNewInputBox.innerHTML = `
-                <div class="form-group">
-                    <select name="Items[${itemIndex}].Id" class="select_item_to_sell">
+                <div class="form-group" id="element${itemIndex}">
+                    <select name="Items[${itemIndex}].Id" class="select_item_to_sell" onchange="updateMax(this)">
                         <option></option>
     @foreach (var item in Model.Items)
     {
-                                <option value="@item.Id">
+                                <option value="@item.Id" data-available="@item.Available">
             @item.Name - @item.Price грн - @item.Available @item.Unit
                                 </option>
     }
                     </select>
-                    <input type="number" name="Items[${itemIndex}].Quantity" step="1" min="1" max="50" value="1"/>
+                    <input type="number" name="Items[${itemIndex}].Quantity" class="item_quantity_input" step="1" min="1" value="0" />
+                                            <button type="button" class="delete_btn" onclick="deleteElement('element${itemIndex}')">Видалити</button>
+
                 </div>`;
 
         document.getElementById("inputFields").appendChild(txtNewInputBox);
-        itemIndex++; // Збільшення індексу для наступного елемента
+        itemIndex++; 
+    }
+
+
+
+
+
+    function updateMax(select) {
+        var selectedOption = select.options[select.selectedIndex];
+        var availableQuantity = parseInt(selectedOption.getAttribute('data-available'));
+        var quantityInput = select.nextElementSibling;
+        quantityInput.max = availableQuantity;
+    }
+
+
+    function deleteElement(elementId) {
+        var element = document.getElementById(elementId);
+        if (element) {
+            element.remove();
+            itemIndex--; // Зменшуємо індекс, оскільки один елемент був видалений
+        } else {
+            console.error('Елемент з ID', elementId, 'не знайдено.');
+        }
     }
 </script>
 
-<h1>Create</h1>
+<div class="container">
+    <h1>Create</h1>
 
-<h4>Check</h4>
-<hr />
-<div class="row" id="row">
-    <form asp-action="Create">
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <div id="inputFields">
-            <div class="form-group">
-                <select name="Items[0].Id" class="select_item_to_sell">
-                    <option></option>
-                    @foreach (var item in Model.Items)
-                    {
-                        <option value="@item.Id">
-                            @item.Name - @item.Price грн - @item.Available @item.Unit
-                        </option>
-                    }
-                </select>
-                <input type="number" name="Items[0].Quantity" step="1" min="1" max="50" value="1" />
+    <h4>Check</h4>
+    <hr />
+    <div class="row" id="row">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div id="inputFields">
+                <div class="form-group" id="element0">
+                    <select name="Items[0].Id" class="select_item_to_sell" onchange="updateMax(this)">
+                        <option></option>
+                        @foreach (var item in Model.Items)
+                        {
+                            <option value="@item.Id" data-available="@item.Available">
+                                @item.Name - @item.Price грн - @item.Available @item.Unit
+                            </option>
+                        }
+                    </select>
+                    <input type="number" name="Items[0].Quantity" class="item_quantity_input" step="0.1" min="0.1" value="0" />
+                    @* <input type="number" name="Items[0].Quantity" class="item_quantity_input" min="1" inputmode="decimal" value="0" step="0.01" /> *@
+                    <button type="button" class="delete_btn" onclick="deleteElement('element0')">Видалити</button>
+
+                </div>
             </div>
-        </div>
+            <div id="dynamicCheck">
+                <input type="button" value="Додати" onclick="createNewElement();" class="add_button" />
+            </div>
+            <button type="submit" class="submit_button">Створити</button>
+        </form>
 
-        <button type="submit">Submit</button>
-    </form>
-    <div id="dynamicCheck">
-        <input type="button" value="Додати" onclick="createNewElement();" />
     </div>
-</div>
-    
-      
-        <div class="sum">
-            <p>Усього:</p>
-            <input type="number" readonly value="82" />
-            
-        </div>
-</div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
+    <div class="sum">
+        <p>Усього:</p>
+        <input type="number" readonly value="82" class="total_input" />
+    </div>
+
+    <div>
+        <a asp-action="Index" class="back_link">Back to List</a>
+    </div>
 </div>
 
 @section Scripts {

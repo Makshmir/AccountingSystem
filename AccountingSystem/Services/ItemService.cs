@@ -35,6 +35,8 @@ namespace AccountingSystem.Services
 
         public void Update(string id, Item itemIn)
         {
+            itemIn.MarkupPriceNumeric = Math.Round(itemIn.Price - itemIn.PurchPrice, 2);
+            itemIn.MarkupPriceInterest = Math.Round(itemIn.Price / itemIn.PurchPrice-1, 2);
             items.ReplaceOne(item => item.Id == id, itemIn);
         }
 

@@ -1,4 +1,6 @@
-﻿namespace AccountingSystem.Models
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace AccountingSystem.Models
 {
     public class OrderViewModel
     {
@@ -8,7 +10,9 @@
     public class OrderItemViewModel
     {
         public string Id { get; set; }
-        public int Quantity { get; set; }
+
+        [Range(0.1, Double.MaxValue, ErrorMessage = "Please enter a value bigger than {1}")]
+        public double Quantity { get; set; }
     }
 
 }

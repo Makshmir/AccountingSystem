@@ -322,3 +322,167 @@ tbody {
         transform: translateY(-50%);
         pointer-events: none;
     }
+
+
+
+.select_item_to_sell {
+    width: 65%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.item_quantity_input {
+    width: 20%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.submit_button {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    .submit_button:hover {
+        background-color: #45a049;
+    }
+
+.add_button {
+    background-color: #008CBA;
+    color: white;
+    padding: 15px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+    .add_button:hover {
+        background-color: #007aaf;
+    }
+
+.sum {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f2f2f2;
+    border-radius: 5px;
+}
+
+.total_input {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.back_link {
+    color: #007bff;
+    text-decoration: none;
+}
+
+    .back_link:hover {
+        text-decoration: underline;
+    }
+
+
+.delete_btn {
+    background-color: #f44336; /* Червоний колір */
+    color: white; /* Білий колір тексту */
+    border: none; /* Відсутня рамка */
+    padding: 10px 20px; /* Подушка */
+    cursor: pointer; /* Змінюється курсор при наведенні */
+    border-radius: 5px; /* Закруглені кути */
+    transition: background-color 0.3s; /* Плавна зміна кольору при наведенні */
+}
+
+    .delete_btn:hover {
+        background-color: #d32f2f; /* Темно-червоний колір при наведенні */
+    }
+
+
+/* Загальні стилі для контейнера з деталями чека */
+.check-details {
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width:50%;
+}
+
+/* Стилі для меток деталей чека */
+.check-details-label {
+    font-weight: bold;
+    color: #333;
+}
+
+/* Стилі для значень деталей чека */
+.check-details-value {
+    color: #555;
+}
+
+/* Додаткові стилі для візуального покращення */
+.check-details-label, .check-details-value {
+    padding: 10px 0;
+}
+
+/* Вирівнювання тексту для меток */
+
+
+/* Стилі для таблиці з товарами */
+.table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+}
+
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .table th {
+        background-color: #f2f2f2;
+        color: #333;
+        text-align: left;
+    }
+
+    .table td {
+        color: #555;
+    }
+
+/* Кнопка повернення до списку */
+a.btn-back {
+    display: inline-block;
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+}
+
+    a.btn-back:hover {
+        background-color: #0056b3;
+    }
+
+.details_div{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+}

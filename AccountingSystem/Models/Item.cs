@@ -75,5 +75,11 @@ namespace AccountingSystem.Models
         [Required]
         public string Unit { get; set; }
 
+
+
+        //[BsonElement("SupplierId")]
+        //[Required]
+        //public string SupplierId { get; set; }
+
     }
 }
