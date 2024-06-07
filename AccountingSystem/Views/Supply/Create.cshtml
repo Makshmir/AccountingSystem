@@ -1,0 +1,128 @@
+﻿@model AccountingSystem.Models.Supply
+
+@{
+    ViewData["Title"] = "Create Supply";
+    var items = ViewBag.Items as List<Item>;
+    var itemCount = Model?.Items?.Count ?? 1;
+}
+
+<h1>Create Supply</h1>
+
+<h4>Supply</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create" method="post">
+            <div class="form-group">
+                <label>Supplier</label>
+                <select asp-for="SupplierId" class="form-control">
+                    @foreach (var supplier in ViewBag.Suppliers)
+                    {
+                        <option value="@supplier.Id">@supplier.Name</option>
+                    }
+                </select>
+                <span asp-validation-for="SupplierId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label>Supply Date</label>
+                <input asp-for="SupplyDate" class="form-control" type="date" />
+                <span asp-validation-for="SupplyDate" class="text-danger"></span>
+            </div>
+
+            <h4>Items</h4>
+            <input type="hidden" id="ItemCount" name="ItemCount" value="@itemCount" />
+            <div id="supplyItems">
+                @for (int i = 0; i < itemCount; i++)
+                {
+                    <div class="form-group">
+                        <label>Item</label>
+                        <select class="form-control" name="Items[@i].ItemId">
+                            @foreach (var item in items)
+                            {
+                                <option value="@item.Id">@item.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Items[@i].ItemId" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Quantity</label>
+                        <input class="form-control" type="number" name="Items[@i].Quantity" />
+                        <span asp-validation-for="Items[@i].Quantity" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Price</label>
+                        <input class="form-control" type="number" name="Items[@i].PurchasePrice" />
+                        <span asp-validation-for="Items[@i].PurchasePrice" class="text-danger"></span>
+                    </div>
+                }
+            </div>
+
+            <button type="button" id="addItem" class="btn btn-secondary">Add Item</button>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <script type="text/javascript">
+        var items = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(items));
+        var itemCount = @itemCount;
+
+        document.getElementById("addItem").addEventListener("click", function () {
+            var supplyItemsDiv = document.getElementById("supplyItems");
+
+            var newItemDiv = document.createElement("div");
+            newItemDiv.className = "form-group";
+
+            var itemLabel = document.createElement("label");
+            itemLabel.textContent = "Item";
+            newItemDiv.appendChild(itemLabel);
+
+            var itemSelect = document.createElement("select");
+            itemSelect.className = "form-control";
+            itemSelect.name = "Items[" + itemCount + "].ItemId";
+
+            items.forEach(function (item) {
+                var option = document.createElement("option");
+                option.value = item.Id;
+                option.textContent = item.Name;
+                itemSelect.appendChild(option);
+            });
+
+            newItemDiv.appendChild(itemSelect);
+
+            var quantityLabel = document.createElement("label");
+            quantityLabel.textContent = "Quantity";
+            newItemDiv.appendChild(quantityLabel);
+
+            var quantityInput = document.createElement("input");
+            quantityInput.className = "form-control";
+            quantityInput.name = "Items[" + itemCount + "].Quantity";
+            quantityInput.type = "number";
+            newItemDiv.appendChild(quantityInput);
+
+            var purchPrInput = document.createElement("input");
+            purchPrInput.className = "form-control";
+            purchPrInput.name = "Items[" + itemCount + "].PurchasePrice";
+            purchPrInput.type = "number";
+            newItemDiv.appendChild(purchPrInput);
+
+
+            supplyItemsDiv.appendChild(newItemDiv);
+
+            itemCount++;
+            document.getElementById("ItemCount").value = itemCount;
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

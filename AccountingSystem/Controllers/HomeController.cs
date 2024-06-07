@@ -1,20 +1,12 @@
-using AccountingSystem.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
-using MongoDB.Driver;
-using MongoDB.Bson;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading.Tasks;
 
 namespace AccountingSystem.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-
-        public HomeController(ILogger<HomeController> logger)
-        {
-            _logger = logger;
-        }
-
         public IActionResult Index()
         {
             return View();
@@ -25,10 +17,21 @@ namespace AccountingSystem.Controllers
             return View();
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [HttpGet]
+        public IActionResult Login()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            var redirectUrl = Url.Action(nameof(Index), "Home");
+            var properties = new AuthenticationProperties { RedirectUri = redirectUrl };
+            return Challenge(properties, "Auth0");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Logout()
+        {
+            var callbackUrl = Url.Action(nameof(Index), "Home", values: null, protocol: Request.Scheme);
+            await HttpContext.SignOutAsync("Auth0", new AuthenticationProperties { RedirectUri = callbackUrl });
+            await HttpContext.SignOutAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToAction(nameof(Index));
         }
     }
 }

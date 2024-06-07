@@ -1,11 +1,12 @@
 ﻿using AccountingSystem.Models;
 using AccountingSystem.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AccountingSystem.Controllers
 {
-   
 
+    [Authorize]
     public class SupplierController : Controller
     {
          private readonly SupplierService supplierService;
@@ -19,6 +20,15 @@ namespace AccountingSystem.Controllers
         public ActionResult Index()
         {
             return View(supplierService.Get());
+
+
+
+
+
+
+
+
+
         }
 
 

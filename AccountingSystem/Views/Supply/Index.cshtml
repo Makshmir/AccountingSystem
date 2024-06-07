@@ -1,0 +1,40 @@
+﻿@model IEnumerable<AccountingSystem.Models.SupplyViewModel>
+
+@{
+    ViewData["Title"] = "Supply Index";
+}
+
+<h1>Supply Index</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Supplier</th>
+            <th>Supply Date</th>
+            <th>Items</th>
+            <th>Total Amount</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var supply in Model)
+        {
+            <tr>
+                <td>@supply.SupplierName</td>
+                <td>@supply.SupplyDate.ToString("yyyy-MM-dd")</td>
+                <td>
+                    <ul>
+                        @foreach (var item in supply.Items)
+                        {
+                            <li>@item.ItemName - @item.Quantity - @item.PurchasePrice - @item.TotalPrice</li>
+                        }
+                    </ul>
+                </td>
+                <td>@supply.TotalAmount</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    <a asp-action="Create" class="btn btn-primary">Create New Supply</a>
+</div>

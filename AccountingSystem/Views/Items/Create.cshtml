@@ -1,5 +1,4 @@
-﻿@model AccountingSystem.Models.Item
-
+﻿@model dynamic
 @{
     ViewData["Title"] = "Create";
 }
@@ -14,73 +13,71 @@
 
             <div class="form-group">
                 <label> Назва товару</label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
+                <input name="Items.Name" value="@Model.Items.Name" class="form-control" />
+                <span class="text-danger"></span>
             </div>
 
             <div class="input_group">
-                <div class="form-group">    
+                <div class="form-group">
                     <label>Категорія</label>
-                    <input asp-for="Category" class="form-control" />
-                    <span asp-validation-for="Category" class="text-danger"></span>
+                    <input name="Items.Category" value="@Model.Items.Category" class="form-control" />
+                    <span class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label>Одиниці виміру</label>
-                    <select asp-for="Unit"  class="form-control">
+                    <select name="Items.Unit" class="form-control">
                         <option value="Шт">Шт</option>
                         <option value="Кг">Кг</option>
                         <option value="Л">Л</option>
                     </select>
-                    <span asp-validation-for="Unit" class="text-danger"></span>
+                    <span class="text-danger"></span>
                 </div>
             </div>
-
-@*             <div class="form-group">
-                <label>Категорія</label>
-                <select asp-for="Category" class="form-control">
-                    <option value="1"></option>
-                    <option value="2">Кг</option>
-                    <option value="3">Л</option>
-                </select>
-                <span asp-validation-for="Unit" class="text-danger"></span>
-            </div> *@
-
 
             <div class="input_group">
                 <div class="form-group">
                     <label>Залишок на складі</label>
-                    <input asp-for="Available" type="number" class="form-control" />
-                    <span asp-validation-for="Available" class="text-danger"></span>
+                    <input name="Items.Available" type="number" value="@Model.Items.Available" class="form-control" />
+                    <span class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
                     <label>Штрих-код</label>
-                    <input asp-for="Barcode" class="form-control" />
-                    <span asp-validation-for="Barcode" class="text-danger"></span>
+                    <input name="Items.Barcode" value="@Model.Items.Barcode" class="form-control" />
+                    <span class="text-danger"></span>
                 </div>
             </div>
 
             <div class="input_group">
                 <div class="form-group">
                     <label> Ціна закупівлі</label>
-
-                    <input asp-for="PurchPrice" type="number" class="form-control" />
-                    <span asp-validation-for="PurchPrice" class="text-danger"></span>
+                    <input name="Items.PurchPrice" type="number" value="@Model.Items.PurchPrice" class="form-control" />
+                    <span class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
                     <label> Ціна продажу</label>
-                    <input asp-for="Price" type="number" class="form-control" />
-                    <span asp-validation-for="Price" class="text-danger"></span>
+                    <input name="Items.Price" type="number" value="@Model.Items.Price" class="form-control" />
+                    <span class="text-danger"></span>
                 </div>
             </div>
+
             <div class="form-group">
-                <label>Фото</label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                <label> Постачальник</label>
+                <select name="Items.SupplierId" class="form-control">
+                    <option value="">Виберіть постачальника</option>
+                    @foreach (var supplier in Model.Supplier)
+                    {
+                        <option value="@supplier.Id">@supplier.Name @supplier.ContactNumber</option>
+                    }
+                </select>
             </div>
 
-
+            <div class="form-group">
+                <label>Фото</label>
+                <input name="Items.ImageUrl" value="@Model.Items.ImageUrl" class="form-control" />
+                <span class="text-danger"></span>
+            </div>
 
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />

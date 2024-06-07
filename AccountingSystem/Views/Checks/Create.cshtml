@@ -25,17 +25,16 @@
                 <div class="form-group" id="element${itemIndex}">
                     <select name="Items[${itemIndex}].Id" class="select_item_to_sell" onchange="updateMax(this)">
                         <option></option>
-    @foreach (var item in Model.Items)
-    {
-                                <option value="@item.Id" data-available="@item.Available">
-            @item.Name - @item.Price грн - @item.Available @item.Unit
-                                </option>
-    }
+                        @foreach (var item in Model.Items)
+                        {
+                            <option value="@item.Id" data-available="@item.Available">
+                                @item.Name - @item.Price грн - @item.Available @item.Unit
+                            </option>
+                        }
                     </select>
                     <input type="number" name="Items[${itemIndex}].Quantity" class="item_quantity_input" step="1" min="1" value="0" />
-                                            <button type="button" class="delete_btn" onclick="deleteElement('element${itemIndex}')">Видалити</button>
-
-                </div>`;
+                    <button type="button" class="delete_btn" onclick="deleteElement('element${itemIndex}')">Видалити</button>
+                    </div>`;
 
         document.getElementById("inputFields").appendChild(txtNewInputBox);
         itemIndex++; 

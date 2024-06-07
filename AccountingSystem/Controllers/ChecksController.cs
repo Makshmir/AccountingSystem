@@ -1,6 +1,7 @@
 ﻿using AccountingSystem.Models;
 using AccountingSystem.Services;
 using IronBarCode;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -8,6 +9,7 @@ using System.Dynamic;
 
 namespace AccountingSystem.Controllers
 {
+    [Authorize]
     public class checksController : Controller
     {
         private readonly CheckService checkService;
@@ -39,25 +41,21 @@ namespace AccountingSystem.Controllers
 
 
 
-        // GET: itemsController/Create
+
+        [HttpGet]
         public ActionResult Create()
         {
             dynamic mymodel = new ExpandoObject();
             mymodel.Items = itemService.Get();
-
             mymodel.Checks = checkService.Get();
             return View(mymodel);
         }
 
-        // POST: items/Create/5
+        [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(OrderViewModel model)
         {
-            foreach (var item in model.Items)
-            {
-                Console.WriteLine($"Item ID: {item.Id}, Quantity: {item.Quantity}");
-            }
 
             checkService.Create(model);
 

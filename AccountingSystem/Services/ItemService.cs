@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using AccountingSystem.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Data;
 
 namespace AccountingSystem.Services
 {
@@ -39,6 +41,16 @@ namespace AccountingSystem.Services
             itemIn.MarkupPriceInterest = Math.Round(itemIn.Price / itemIn.PurchPrice-1, 2);
             items.ReplaceOne(item => item.Id == id, itemIn);
         }
+        public void UpdateQuantity(string itemId, int quantity)
+        {
+            var item = items.Find<Item>(i => i.Id == itemId).FirstOrDefault();
+            if (item != null)
+            {
+                item.Available += quantity;
+                items.ReplaceOne(i => i.Id == itemId, item);
+            }
+        }
+
 
         public void Remove(Item itemIn)
         {

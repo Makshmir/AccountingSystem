@@ -10,24 +10,18 @@ namespace AccountingSystem.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
-
-
         [BsonElement("Barcode")]
         [BsonRequired]
         public string Barcode { get; set; }
-
 
         [BsonElement("Name")]
         [Display(Name = "Назва товару")]
         [Required]
         public string Name { get; set; }
 
-
         [BsonElement("Category")]
         [Required]
         public string Category { get; set; }
-
-
 
         [BsonElement("Available")]
         [Required]
@@ -35,21 +29,14 @@ namespace AccountingSystem.Models
         [AvailableRange]
         public double Available { get; set; }
 
-
-
-
         [BsonElement("Price")]
         [Display(Name = "Ціна(грн)")]
         [Required]
-        //[DisplayFormat(DataFormatString = "{0:#.0}")]
         public double Price { get; set; }
-
-
 
         [BsonElement("PurchasePrice")]
         [Display(Name = "Собівартість(грн)")]
         [Required]
-        // [DisplayFormat(DataFormatString = "{0:#.0}")]
         public double PurchPrice { get; set; }
 
 
@@ -59,27 +46,18 @@ namespace AccountingSystem.Models
         [BsonElement("MarkupPriceNumeric")]
         public double MarkupPriceNumeric { get; set; }
 
-
-
-
-
         [BsonElement("ImageUrl")]
         [Display(Name = "Photo")]
         [DataType(DataType.ImageUrl)]
         [Required]
         public string ImageUrl { get; set; }
 
-
-
         [BsonElement("Unit")]
         [Required]
         public string Unit { get; set; }
 
-
-
-        //[BsonElement("SupplierId")]
-        //[Required]
-        //public string SupplierId { get; set; }
-
+        [BsonElement("SupplierId")]
+        [Required]
+        public string SupplierId { get; set; }
     }
 }

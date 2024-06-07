@@ -412,7 +412,6 @@ tbody {
     }
 
 
-/* Загальні стилі для контейнера з деталями чека */
 .check-details {
     background-color: #f9f9f9;
     border: 1px solid #ddd;
@@ -425,26 +424,21 @@ tbody {
     max-width:50%;
 }
 
-/* Стилі для меток деталей чека */
 .check-details-label {
     font-weight: bold;
     color: #333;
 }
 
-/* Стилі для значень деталей чека */
 .check-details-value {
     color: #555;
 }
 
-/* Додаткові стилі для візуального покращення */
+
 .check-details-label, .check-details-value {
     padding: 10px 0;
 }
 
-/* Вирівнювання тексту для меток */
 
-
-/* Стилі для таблиці з товарами */
 .table {
     width: 100%;
     margin-bottom: 20px;
@@ -466,7 +460,6 @@ tbody {
         color: #555;
     }
 
-/* Кнопка повернення до списку */
 a.btn-back {
     display: inline-block;
     padding: 10px 15px;

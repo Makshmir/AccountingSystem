@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.Extensions.Configuration;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using AccountingSystem.Models;
+
 
 namespace AccountingSystem.Services
 {
@@ -57,7 +54,6 @@ namespace AccountingSystem.Services
                     }
                     else
                     {
-                        // Обробка ситуації, коли запитувана кількість перевищує доступну
                         throw new Exception($"Запитувана кількість товару \"{item.Name}\" перевищує доступну кількість на складі.");
                     }
                 }
@@ -100,7 +96,6 @@ namespace AccountingSystem.Services
             };
         }
 
-
         public void Delete(string id)
         {
             checks.DeleteOne(check => check.Id == id);
@@ -113,7 +108,6 @@ namespace AccountingSystem.Services
                 Item item = items.Find(i => i.Id == orderItem.Id).FirstOrDefault();
                 if (item != null)
                 {
-                    // Додавання кількості товару до доступного залишку на складі
                     item.Available += orderItem.Quantity;
                     var filter = Builders<Item>.Filter.Eq("Id", item.Id);
                     var update = Builders<Item>.Update.Set("Available", item.Available);
