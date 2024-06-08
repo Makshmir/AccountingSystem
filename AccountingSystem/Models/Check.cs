@@ -1,4 +1,7 @@
-﻿
+﻿using AccountingSystem.CustomAttributes;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 using AccountingSystem.CustomAttributes;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
@@ -15,6 +18,9 @@ namespace AccountingSystem.Models
         public string Id { get; set; }
 
 
+        [BsonElement("UserId")]
+        [Required]
+        public string UserId { get; set; }
 
         [BsonElement("Date")]
         public DateTime Date { get; set; }

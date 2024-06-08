@@ -5,7 +5,21 @@
     var items = ViewBag.Items as List<Item>;
     var itemCount = Model?.Items?.Count ?? 1;
 }
+<script>
+    window.onload = function loadDate() {
+        let date = new Date(),
+            day = date.getDate(),
+            month = date.getMonth() + 1,
+            year = date.getFullYear();
 
+        if (month < 10) month = "0" + month;
+        if (day < 10) day = "0" + day;
+
+        const todayDate = `${year}-${month}-${day}`;
+
+        document.getElementById("date").defaultValue = todayDate;
+    };
+</script>
 <h1>Create Supply</h1>
 
 <h4>Supply</h4>
@@ -26,7 +40,7 @@
 
             <div class="form-group">
                 <label>Supply Date</label>
-                <input asp-for="SupplyDate" class="form-control" type="date" />
+                <input asp-for="SupplyDate" class="form-control" onload="getDate()" type="date" id="date" />
                 <span asp-validation-for="SupplyDate" class="text-danger"></span>
             </div>
 

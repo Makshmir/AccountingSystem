@@ -2,15 +2,14 @@
 using AccountingSystem.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace AccountingSystem.Controllers
 {
-
     [Authorize]
     public class SupplierController : Controller
     {
-         private readonly SupplierService supplierService;
-
+        private readonly SupplierService supplierService;
 
         public SupplierController(SupplierService supplierService)
         {
@@ -19,30 +18,21 @@ namespace AccountingSystem.Controllers
 
         public ActionResult Index()
         {
-            return View(supplierService.Get());
-
-
-
-
-
-
-
-
-
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            return View(supplierService.GetByUserId(userId));
         }
-
 
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: items/Create/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult Create(Supplier supplier)
         {
-
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            supplier.UserId = userId;
             supplierService.Create(supplier);
             return RedirectToAction(nameof(Index));
         }
@@ -54,30 +44,31 @@ namespace AccountingSystem.Controllers
                 return NotFound();
             }
 
-            var item = supplierService.Get(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var item = supplierService.Get(id, userId);
             if (item == null)
             {
                 return NotFound();
             }
+
             return View(item);
         }
 
-
-        // POST: items/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public ActionResult DeleteConfirmed(string id)
         {
             try
             {
-                var item = supplierService.Get(id);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
+                var item = supplierService.Get(id, userId);
 
                 if (item == null)
                 {
                     return NotFound();
                 }
 
-                supplierService.Remove(item.Id);
+                supplierService.Remove(item.Id, userId);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -86,13 +77,5 @@ namespace AccountingSystem.Controllers
                 return View();
             }
         }
-
-
-
-
-
     }
-
-
-
 }

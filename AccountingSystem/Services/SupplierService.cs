@@ -1,36 +1,30 @@
-﻿using AccountingSystem.Models;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+using AccountingSystem.Models;
+using System.Collections.Generic;
+using Microsoft.Extensions.Configuration;
 
 namespace AccountingSystem.Services
 {
     public class SupplierService
     {
-
-        private readonly IMongoCollection<Check> checks;
-        private readonly IMongoCollection<Item> items;
         private readonly IMongoCollection<Supplier> suppliers;
 
         public SupplierService(IConfiguration config)
         {
             MongoClient client = new MongoClient(config.GetConnectionString("AccountingDb"));
             IMongoDatabase database = client.GetDatabase("AccountingDb");
-            checks = database.GetCollection<Check>("Checks");
-            items = database.GetCollection<Item>("items");
-            suppliers= database.GetCollection<Supplier>("suppliers");
+            suppliers = database.GetCollection<Supplier>("Suppliers");
         }
 
-
-
-        public List<Supplier> Get()
+        public List<Supplier> GetByUserId(string userId)
         {
-            return suppliers.Find(item => true).ToList();
+            return suppliers.Find(supplier => supplier.UserId == userId).ToList();
         }
 
-        public Supplier Get(string id)
+        public Supplier Get(string id, string userId)
         {
-            return suppliers.Find(item => item.Id == id).FirstOrDefault();
+            return suppliers.Find(supplier => supplier.Id == id && supplier.UserId == userId).FirstOrDefault();
         }
-
 
         public Supplier Create(Supplier supplier)
         {
@@ -38,17 +32,9 @@ namespace AccountingSystem.Services
             return supplier;
         }
 
-
-
-        public void Remove(Supplier suppIn)
+        public void Remove(string id, string userId)
         {
-            suppliers.DeleteOne(item => item.Id == suppIn.Id);
+            suppliers.DeleteOne(supplier => supplier.Id == id && supplier.UserId == userId);
         }
-
-        public void Remove(string id)
-        {
-            suppliers.DeleteOne(item => item.Id == id);
-        }
-
     }
 }

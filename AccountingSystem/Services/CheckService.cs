@@ -1,6 +1,8 @@
 ﻿using MongoDB.Driver;
 using AccountingSystem.Models;
-
+using System.Collections.Generic;
+using System;
+using Microsoft.Extensions.Configuration;
 
 namespace AccountingSystem.Services
 {
@@ -17,14 +19,14 @@ namespace AccountingSystem.Services
             items = database.GetCollection<Item>("items");
         }
 
-        public List<Check> Get()
+        public List<Check> GetByUserId(string userId)
         {
-            return checks.Find(item => true).ToList();
+            return checks.Find(check => check.UserId == userId).ToList();
         }
 
-        public Check Get(string id)
+        public Check Get(string id, string userId)
         {
-            return checks.Find(item => item.Id == id).FirstOrDefault();
+            return checks.Find(check => check.Id == id && check.UserId == userId).FirstOrDefault();
         }
 
         public Check Create(OrderViewModel model)
@@ -38,7 +40,6 @@ namespace AccountingSystem.Services
                 Item item = items.Find(i => i.Id == orderItem.Id).FirstOrDefault();
                 if (item != null)
                 {
-
                     if (orderItem.Quantity <= item.Available)
                     {
                         double itemTotal = Math.Round(orderItem.Quantity * item.Price, 2);
@@ -61,6 +62,7 @@ namespace AccountingSystem.Services
 
             var check = new Check
             {
+                UserId = model.UserId,
                 Items = itemsList,
                 Sum = Math.Round(totalSum, 2),
                 Date = DateTime.Now,
@@ -71,9 +73,9 @@ namespace AccountingSystem.Services
             return check;
         }
 
-        public CheckDetailsViewModel GetCheckDetails(string id)
+        public CheckDetailsViewModel GetCheckDetails(string id, string userId)
         {
-            var check = checks.Find(c => c.Id == id).FirstOrDefault();
+            var check = checks.Find(c => c.Id == id && c.UserId == userId).FirstOrDefault();
             if (check == null)
             {
                 return null;
@@ -96,9 +98,9 @@ namespace AccountingSystem.Services
             };
         }
 
-        public void Delete(string id)
+        public void Delete(string id, string userId)
         {
-            checks.DeleteOne(check => check.Id == id);
+            checks.DeleteOne(check => check.Id == id && check.UserId == userId);
         }
 
         public void ReturnItemsToStock(List<OrderItemViewModel> itemsList)

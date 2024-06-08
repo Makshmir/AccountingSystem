@@ -10,6 +10,10 @@ namespace AccountingSystem.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
 
+        [BsonElement("UserId")]
+        [Required]
+        public string UserId { get; set; }
+
         [BsonElement("Barcode")]
         [BsonRequired]
         public string Barcode { get; set; }

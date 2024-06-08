@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using MongoDB.Driver;
 using AccountingSystem.Models;
-using Microsoft.EntityFrameworkCore;
-using System.Data;
+using System;
 
 namespace AccountingSystem.Services
 {
@@ -19,14 +18,14 @@ namespace AccountingSystem.Services
             items = database.GetCollection<Item>("items");
         }
 
-        public List<Item> Get()
+        public List<Item> GetByUserId(string userId)
         {
-            return items.Find(item => true).ToList();
+            return items.Find(item => item.UserId == userId).ToList();
         }
 
-        public Item Get(string id)
+        public Item Get(string id, string userId)
         {
-            return items.Find(item => item.Id == id).FirstOrDefault();
+            return items.Find(item => item.Id == id && item.UserId == userId).FirstOrDefault();
         }
 
         public Item Create(Item item)
@@ -35,31 +34,40 @@ namespace AccountingSystem.Services
             return item;
         }
 
-        public void Update(string id, Item itemIn)
+        public void Update(string id, Item itemIn, string userId)
         {
             itemIn.MarkupPriceNumeric = Math.Round(itemIn.Price - itemIn.PurchPrice, 2);
-            itemIn.MarkupPriceInterest = Math.Round(itemIn.Price / itemIn.PurchPrice-1, 2);
-            items.ReplaceOne(item => item.Id == id, itemIn);
+            itemIn.MarkupPriceInterest = Math.Round((itemIn.Price / itemIn.PurchPrice - 1) * 100, 2);
+            items.ReplaceOne(item => item.Id == id && item.UserId == userId, itemIn);
         }
-        public void UpdateQuantity(string itemId, int quantity)
+
+        public void UpdateQuantityAndPurchasePrice(string itemId, int quantity, double purchasePrice, string userId)
         {
-            var item = items.Find<Item>(i => i.Id == itemId).FirstOrDefault();
+            var item = items.Find<Item>(i => i.Id == itemId && i.UserId == userId).FirstOrDefault();
             if (item != null)
             {
                 item.Available += quantity;
-                items.ReplaceOne(i => i.Id == itemId, item);
+                item.PurchPrice = purchasePrice;
+                item.MarkupPriceNumeric = Math.Round(item.Price - item.PurchPrice, 2);
+                item.MarkupPriceInterest = Math.Round((item.Price / item.PurchPrice - 1) * 100, 2);
+                var filter = Builders<Item>.Filter.Eq("Id", item.Id);
+                var update = Builders<Item>.Update
+                    .Set("Available", item.Available)
+                    .Set("PurchPrice", item.PurchPrice)
+                    .Set("MarkupPriceNumeric", item.MarkupPriceNumeric)
+                    .Set("MarkupPriceInterest", item.MarkupPriceInterest);
+                items.UpdateOne(filter, update);
             }
         }
 
-
-        public void Remove(Item itemIn)
+        public void Remove(Item itemIn, string userId)
         {
-            items.DeleteOne(item => item.Id == itemIn.Id);
+            items.DeleteOne(item => item.Id == itemIn.Id && item.UserId == userId);
         }
 
-        public void Remove(string id)
+        public void Remove(string id, string userId)
         {
-            items.DeleteOne(item => item.Id == id);
+            items.DeleteOne(item => item.Id == id && item.UserId == userId);
         }
     }
 }

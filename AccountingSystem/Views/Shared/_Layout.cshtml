@@ -34,21 +34,26 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Supply" asp-action="Index">Постачання</a>
                         </li>
-                        @if (User.Identity.IsAuthenticated)
-                        {
-                            <li>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
+                        </ul>
 
-                            </li>
-                        }
-                        else
-                        {
-                            <li>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Login</a>
-                            </li>
-                        }
+                        <div class="account_div">
+                            <ul class="navbar-nav flex-grow-1">
+                                @if (User.Identity.IsAuthenticated)
+                                {
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
 
-                    </ul>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Login</a>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    
                 </div>
             </div>
         </nav>

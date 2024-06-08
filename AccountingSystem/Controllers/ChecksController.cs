@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Dynamic;
+using System.Security.Claims;
 
 namespace AccountingSystem.Controllers
 {
@@ -23,7 +24,8 @@ namespace AccountingSystem.Controllers
 
         public IActionResult GetDetails(string id)
         {
-            var check = checkService.Get(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var check = checkService.Get(id, userId);
             if (check == null)
             {
                 return NotFound();
@@ -31,23 +33,21 @@ namespace AccountingSystem.Controllers
             return PartialView("_CheckDetails", check);
         }
 
-
-        // GET: itemsController
+        // GET: checksController
         public ActionResult Index()
         {
-            return View(checkService.Get());
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            return View(checkService.GetByUserId(userId));
         }
-
-
-
-
 
         [HttpGet]
         public ActionResult Create()
         {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             dynamic mymodel = new ExpandoObject();
-            mymodel.Items = itemService.Get();
-            mymodel.Checks = checkService.Get();
+            mymodel.Items = itemService.GetByUserId(userId);
+            mymodel.Checks = checkService.GetByUserId(userId);
             return View(mymodel);
         }
 
@@ -56,26 +56,22 @@ namespace AccountingSystem.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult Create(OrderViewModel model)
         {
-
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            model.UserId = userId;
             checkService.Create(model);
-
             return RedirectToAction(nameof(Index));
         }
 
-
-
-
-
-       public IActionResult Details(string id)
+        public IActionResult Details(string id)
         {
-            var checkDetails = checkService.GetCheckDetails(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var checkDetails = checkService.GetCheckDetails(id, userId);
             if (checkDetails == null)
             {
                 return NotFound();
             }
             return View(checkDetails);
         }
-
 
         public ActionResult Delete(string id)
         {
@@ -84,7 +80,8 @@ namespace AccountingSystem.Controllers
                 return NotFound();
             }
 
-            var item = checkService.Get(id);
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var item = checkService.Get(id, userId);
             if (item == null)
             {
                 return NotFound();
@@ -99,15 +96,17 @@ namespace AccountingSystem.Controllers
         {
             try
             {
-                var item = checkService.Get(id);
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                var item = checkService.Get(id, userId);
 
                 if (item == null)
                 {
                     return NotFound();
                 }
-                var deletedCheck = checkService.Get(id);
 
-                checkService.Delete(item.Id);
+                var deletedCheck = checkService.Get(id, userId);
+
+                checkService.Delete(item.Id, userId);
                 checkService.ReturnItemsToStock(deletedCheck.Items);
 
                 return RedirectToAction(nameof(Index));
@@ -117,9 +116,5 @@ namespace AccountingSystem.Controllers
                 return View();
             }
         }
-
-
-
-
     }
 }

@@ -51,14 +51,12 @@
             <div class="input_group">
                 <div class="form-group">
                     <label> Ціна закупівлі</label>
-                    <input name="Items.PurchPrice" type="number" value="@Model.Items.PurchPrice" class="form-control" />
-                    <span class="text-danger"></span>
+                    <input name="Items.PurchPrice" type="number" step="0.01" value="@Model.Items.PurchPrice" class="form-control" />
                 </div>
 
                 <div class="form-group">
                     <label> Ціна продажу</label>
-                    <input name="Items.Price" type="number" value="@Model.Items.Price" class="form-control" />
-                    <span class="text-danger"></span>
+                    <input name="Items.Price" type="number" step="0.01" value="@Model.Items.Price" class="form-control" />
                 </div>
             </div>
 

@@ -1,9 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace AccountingSystem.Models
 {
     public class OrderViewModel
     {
+
+        [BsonElement("UserId")]
+        [Required]
+        public string UserId { get; set; }
         public List<OrderItemViewModel> Items { get; set; }
     }
 

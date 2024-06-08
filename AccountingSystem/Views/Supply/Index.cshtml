@@ -4,37 +4,49 @@
     ViewData["Title"] = "Supply Index";
 }
 
-<h1>Supply Index</h1>
+<h1>Поставки товарів</h1>
+
+<div>
+
+    <a asp-action="Create">
+        <button class="plus_item_btn">
+            <img src="~/images/plus-icon.png" width="32px" height="32px" />Створити поставку
+        </button>
+    </a>
+</div>
+
+
 
 <table class="table">
     <thead>
         <tr>
-            <th>Supplier</th>
-            <th>Supply Date</th>
-            <th>Items</th>
-            <th>Total Amount</th>
+            <th>Постачальник</th>
+            <th>Дата постачання</th>
+            <th>Товари</th>
+            <th>Загальна сума</th>
         </tr>
     </thead>
     <tbody>
         @foreach (var supply in Model)
         {
             <tr>
-                <td>@supply.SupplierName</td>
+                <td>
+                    @Html.ActionLink(Html.DisplayTextFor(modelItem => supply.SupplierName).ToString(), "Edit", new { id = supply.Id })
+                </td>
                 <td>@supply.SupplyDate.ToString("yyyy-MM-dd")</td>
                 <td>
                     <ul>
                         @foreach (var item in supply.Items)
                         {
-                            <li>@item.ItemName - @item.Quantity - @item.PurchasePrice - @item.TotalPrice</li>
+                            <li>@item.ItemName - @item.Quantity х @item.PurchasePrice грн = @item.TotalPrice грн</li>
                         }
                     </ul>
                 </td>
                 <td>@supply.TotalAmount</td>
+  
             </tr>
         }
     </tbody>
 </table>
 
-<div>
-    <a asp-action="Create" class="btn btn-primary">Create New Supply</a>
-</div>
+

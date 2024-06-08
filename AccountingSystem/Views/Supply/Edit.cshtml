@@ -1,0 +1,144 @@
+﻿@model AccountingSystem.Models.Supply
+
+@{
+    ViewData["Title"] = "Edit Supply";
+}
+
+<h1>Редагувати поставку</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-8">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+            <input type="hidden" asp-for="Id" />
+
+            <div class="form-group">
+                <label asp-for="SupplierId" class="control-label">Постачальник</label>
+                <select asp-for="SupplierId" class="form-control">
+                    <option value="">Оберіть постачальника</option>
+                    @foreach (var supplier in ViewBag.Suppliers)
+                    {
+                        string selected = supplier.Id == Model.SupplierId ? "selected" : "";
+                        if (selected == "selected")
+                        {
+                            <option value="@supplier.Id" selected>@supplier.Name</option>
+                        }
+                        else
+                        {
+                            <option value="@supplier.Id">@supplier.Name</option>
+                        }
+                    }
+                </select>
+                <span asp-validation-for="SupplierId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="SupplyDate" class="control-label">Supply Date</label>
+                <input asp-for="SupplyDate" class="form-control" type="date" />
+                <span asp-validation-for="SupplyDate" class="text-danger"></span>
+            </div>
+
+            <div id="supplyItems">
+                @for (int i = 0; i < Model.Items.Count; i++)
+                {
+                    <div class="form-group supply-item">
+                        <label>Товар</label>
+                        <select name="Items[@i].ItemId" class="form-control">
+                            <option value="">Виберіть товар</option>
+                            @foreach (var item in ViewBag.Items)
+                            {
+                                string selected = item.Id == Model.Items[i].ItemId ? "selected" : "";
+                                if (selected == "selected")
+                                {
+                                    <option value="@item.Id" selected>@item.Name</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.Id">@item.Name</option>
+                                }
+                            }
+                        </select>
+                        <div class="quantity_price_block">
+                            <div class="form-group">
+                                <label>Кількість</label>
+                                <input name="Items[@i].Quantity" class="form-control input_quantity_price" type="number" value="@Model.Items[i].Quantity" />
+                            </div>
+                            <div class="form-group">
+                                <label>Ціна закупівлі</label>
+                                <input name="Items[@i].PurchasePrice" class="form-control input_quantity_price" type="number" value="@Model.Items[i].PurchasePrice" />
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="form-group">
+                <button type="button" id="addItem" class="btn btn-secondary">Add Item</button>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="text/javascript">
+        document.getElementById("addItem").addEventListener("click", function () {
+            var supplyItemsDiv = document.getElementById("supplyItems");
+
+            var newItemDiv = document.createElement("div");
+            newItemDiv.className = "form-group supply-item";
+
+            var itemLabel = document.createElement("label");
+            itemLabel.textContent = "Item";
+            newItemDiv.appendChild(itemLabel);
+
+            var itemSelect = document.createElement("select");
+            itemSelect.className = "form-control";
+            itemSelect.name = "Items[" + document.getElementsByClassName("supply-item").length + "].ItemId";
+
+            var items = JSON.parse('@Html.Raw(ViewBag.ItemsJson)');
+
+            items.forEach(function (item) {
+                var option = document.createElement("option");
+                option.value = item.Id;
+                option.text = item.Name;
+                itemSelect.appendChild(option);
+            });
+
+            newItemDiv.appendChild(itemSelect);
+
+            var quantityLabel = document.createElement("label");
+            quantityLabel.textContent = "Quantity";
+            newItemDiv.appendChild(quantityLabel);
+
+            var quantityInput = document.createElement("input");
+            quantityInput.className = "form-control";
+            quantityInput.name = "Items[" + document.getElementsByClassName("supply-item").length + "].Quantity";
+            quantityInput.type = "number";
+            newItemDiv.appendChild(quantityInput);
+
+            var priceLabel = document.createElement("label");
+            priceLabel.textContent = "Purchase Price";
+            newItemDiv.appendChild(priceLabel);
+
+            var priceInput = document.createElement("input");
+            priceInput.className = "form-control";
+            priceInput.name = "Items[" + document.getElementsByClassName("supply-item").length + "].PurchasePrice";
+            priceInput.type = "number";
+            newItemDiv.appendChild(priceInput);
+
+            supplyItemsDiv.appendChild(newItemDiv);
+        });
+    </script>
+}

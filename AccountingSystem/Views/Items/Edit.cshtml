@@ -13,6 +13,7 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input type="hidden" asp-for="Item.Id" />
+            <input type="hidden" asp-for="Item.UserId" value=Item.UserId />
 
             <div class="form-group">
                 <label> Назва товару</label>

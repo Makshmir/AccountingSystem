@@ -1,44 +1,45 @@
-﻿using AccountingSystem.Models;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
+using AccountingSystem.Models;
 using System.Collections.Generic;
-using System.Linq;
+using Microsoft.Extensions.Configuration;
 
 namespace AccountingSystem.Services
 {
     public class SupplyService
     {
-        private readonly IMongoCollection<Supply> _supplies;
+        private readonly IMongoCollection<Supply> supplies;
 
         public SupplyService(IConfiguration config)
         {
-            //var client = new MongoClient(config.ConnectionString);
-            //var database = client.GetDatabase(config.DatabaseName);
-            //_supplies = database.GetCollection<Supply>(config.SuppliesCollectionName);
-
             MongoClient client = new MongoClient(config.GetConnectionString("AccountingDb"));
             IMongoDatabase database = client.GetDatabase("AccountingDb");
-            _supplies = database.GetCollection<Supply>("Supplies");
-
-
+            supplies = database.GetCollection<Supply>("Supplies");
         }
 
-        public List<Supply> Get() => _supplies.Find(supply => true).ToList();
+        public List<Supply> GetByUserId(string userId)
+        {
+            return supplies.Find(supply => supply.UserId == userId).ToList();
+        }
 
-        public Supply Get(string id) => _supplies.Find<Supply>(supply => supply.Id == id).FirstOrDefault();
+        public Supply GetByUserId(string id, string userId)
+        {
+            return supplies.Find(supply => supply.Id == id && supply.UserId == userId).FirstOrDefault();
+        }
 
         public Supply Create(Supply supply)
         {
-            supply.TotalAmount = supply.Items.Sum(item => item.TotalPrice);
-            _supplies.InsertOne(supply);
+            supplies.InsertOne(supply);
             return supply;
         }
 
         public void Update(string id, Supply supplyIn)
         {
-            supplyIn.TotalAmount = supplyIn.Items.Sum(item => item.TotalPrice);
-            _supplies.ReplaceOne(supply => supply.Id == id, supplyIn);
+            supplies.ReplaceOne(supply => supply.Id == id && supply.UserId == supplyIn.UserId, supplyIn);
         }
 
-        public void Remove(string id) => _supplies.DeleteOne(supply => supply.Id == id);
+        public void Remove(string id, string userId)
+        {
+            supplies.DeleteOne(supply => supply.Id == id && supply.UserId == userId);
+        }
     }
 }

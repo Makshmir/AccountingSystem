@@ -103,11 +103,18 @@
 </script>
 
 <h1>Інвентар</h1>
-<a asp-action="Create">
-    <button class="plus_item_btn">
-        <img src="~/images/plus-icon.png" width="32px" height="32px" />Додати позицію
-    </button>
-</a>
+<div class="button_div">
+    <a asp-action="Create">
+        <button class="plus_item_btn">
+            <img src="~/images/plus-icon.png" width="32px" height="32px" />Додати позицію
+        </button>
+    </a>
+    <a asp-action="Create" asp-controller="Supply">
+        <button class="plus_item_btn">
+            <img src="~/images/plus-icon.png" width="32px" height="32px" />Створити постачання
+        </button>
+    </a>
+</div>
 <br />
 
 <hr />
