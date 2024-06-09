@@ -72,16 +72,17 @@ namespace AccountingSystem.Controllers
             };
             model.Supply.Items = new List<SupplyItem>();
             int itemCount = Convert.ToInt32(form["ItemCount"]);
+            
             for (int i = 0; i < itemCount; i++)
             {
                 var item = new SupplyItem
                 {
                     ItemId = form[$"Items[{i}].ItemId"],
                     Quantity = Convert.ToInt32(form[$"Items[{i}].Quantity"]),
-                    PurchasePrice = Convert.ToDouble(form[$"Items[{i}].PurchasePrice"])
+                    PurchasePrice = Math.Round(Convert.ToDouble(form[$"Items[{i}].PurchasePrice"]),2)
                 };
-                model.Supply.Items.Add(item);
                 model.Supply.TotalAmount += item.TotalPrice;
+                model.Supply.Items.Add(item);
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
                 _itemService.UpdateQuantityAndPurchasePrice(item.ItemId, item.Quantity, item.PurchasePrice, userId);
             }
@@ -111,14 +112,26 @@ namespace AccountingSystem.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            supply.SupplyDate=supply.SupplyDate.AddDays(1);
+            Console.WriteLine(supply.SupplyDate);
             if (id != supply.Id)
             {
                 return NotFound();
-            }
+            } 
+                var oldSupply = _supplyService.GetByUserId(id, userId);
+                if (oldSupply != null)
+                {
+                    foreach (var oldItem in oldSupply.Items)
+                    {
 
-            if (ModelState.IsValid)
-            {
-                supply.UserId = userId; // Ensure that the UserId is set correctly
+                        _itemService.UpdateQuantityAndPurchasePrice(oldItem.ItemId, -oldItem.Quantity, oldItem.PurchasePrice, userId);
+                    }
+                }
+                foreach(var item in supply.Items)
+                {
+                    supply.TotalAmount += Math.Round(item.TotalPrice, 2);
+                }
+                supply.UserId = userId;
                 _supplyService.Update(id, supply);
 
                 foreach (var item in supply.Items)
@@ -127,10 +140,7 @@ namespace AccountingSystem.Controllers
                 }
 
                 return RedirectToAction(nameof(Index));
-            }
-            ViewBag.Suppliers = _supplierService.GetByUserId(userId);
-            ViewBag.Items = _itemService.GetByUserId(userId);
-            return View(supply);
+           
         }
 
         public IActionResult Delete(string id)
@@ -144,7 +154,7 @@ namespace AccountingSystem.Controllers
             return View(supply);
         }
 
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public IActionResult DeleteConfirmed(string id)
         {
@@ -154,9 +164,17 @@ namespace AccountingSystem.Controllers
             {
                 return NotFound();
             }
+
+            // Revert item quantities
+            foreach (var item in supply.Items)
+            {
+                _itemService.UpdateQuantity(item.ItemId, -item.Quantity, userId);
+            }
+
             _supplyService.Remove(id, userId);
             return RedirectToAction(nameof(Index));
         }
+
 
         public IActionResult Details(string id)
         {

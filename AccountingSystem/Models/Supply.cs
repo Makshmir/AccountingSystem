@@ -16,6 +16,7 @@ namespace AccountingSystem.Models
         public string UserId { get; set; }
         public string Id { get; set; }
         public string SupplierId { get; set; }
+        [DataType(DataType.Date)]
         public DateTime SupplyDate { get; set; }
         public List<SupplyItem> Items { get; set; }
         public double TotalAmount { get; set; }
@@ -23,10 +24,15 @@ namespace AccountingSystem.Models
 
     public class SupplyItem
     {
+        [Required]
         public string ItemId { get; set; }
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Кількість повинна бути більше 0")]
         public int Quantity { get; set; }
+        [Required]
+        [Range(0.01, double.MaxValue, ErrorMessage = "Ціна повинна бути більше 0")]
         public double PurchasePrice { get; set; }
-        public double TotalPrice => Quantity * PurchasePrice;
+        public double TotalPrice => Math.Round(Quantity * PurchasePrice, 2);
     }
 
 

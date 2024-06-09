@@ -10,29 +10,30 @@
     function createNewElement() {
         var lastSelect = document.querySelector('.select_item_to_sell:last-of-type');
 
-        if (lastSelect.value.trim() === '') {
+        if (lastSelect && lastSelect.value.trim() === '') {
             return;
         }
 
         var txtNewInputBox = document.createElement('div');
+        txtNewInputBox.className = "form-group";
+        txtNewInputBox.id = `element${itemIndex}`;
 
         txtNewInputBox.innerHTML = `
-                    <div class="form-group" id="element${itemIndex}">
-                        <select name="Items[${itemIndex}].Id" class="select_item_to_sell" onchange="updateMax(this); updateTotal();">
-                            <option></option>
+                <select class="select_item_to_sell" onchange="updateMax(this); updateTotal();">
+                    <option></option>
     @foreach (var item in Model.Items)
     {
-                                    <option value="@item.Id" data-price="@item.Price" data-available="@item.Available">
+                            <option value="@item.Id" data-price="@item.Price" data-available="@item.Available">
             @item.Name - @item.Price грн - @item.Available @item.Unit
-                                    </option>
+                            </option>
     }
-                        </select>
-                        <input type="number" name="Items[${itemIndex}].Quantity" class="item_quantity_input" step="1" min="1" value="0" oninput="updateTotal();" />
-                        <button type="button" class="delete_btn" onclick="deleteElement('element${itemIndex}'); updateTotal();">Видалити</button>
-                        </div>`;
+                </select>
+                <input type="number" class="item_quantity_input" step="1" min="1" value="0" oninput="updateTotal();" />
+                <button type="button" class="delete_btn" onclick="deleteElement('element${itemIndex}'); updateTotal();">Видалити</button>`;
 
         document.getElementById("inputFields").appendChild(txtNewInputBox);
         itemIndex++;
+        updateIndexes();
     }
 
     function updateMax(select) {
@@ -46,11 +47,21 @@
         var element = document.getElementById(elementId);
         if (element) {
             element.remove();
-            itemIndex--; // Зменшуємо індекс, оскільки один елемент був видалений
+            updateIndexes(); // Оновити індекси після видалення елемента
         } else {
             console.error('Елемент з ID', elementId, 'не знайдено.');
         }
         updateTotal(); // Оновити загальну суму після видалення елемента
+    }
+
+    function updateIndexes() {
+        var elements = document.querySelectorAll('.form-group');
+        elements.forEach(function (element, index) {
+            var select = element.querySelector('.select_item_to_sell');
+            var quantityInput = element.querySelector('.item_quantity_input');
+            select.name = `Items[${index}].Id`;
+            quantityInput.name = `Items[${index}].Quantity`;
+        });
     }
 
     function updateTotal() {

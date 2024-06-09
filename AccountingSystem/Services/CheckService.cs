@@ -42,7 +42,11 @@ namespace AccountingSystem.Services
                 {
                     if (orderItem.Quantity <= item.Available)
                     {
-                        double itemTotal = Math.Round(orderItem.Quantity * item.Price, 2);
+                        // Зберігаємо ціну товару в orderItem
+                        orderItem.Price = item.Price;
+                        orderItem.Name = item.Name;
+
+                        double itemTotal = Math.Round(orderItem.Quantity * orderItem.Price, 2);
                         totalSum += itemTotal;
 
                         double itemTotalProfit = Math.Round(orderItem.Quantity * item.MarkupPriceNumeric, 2);
@@ -62,16 +66,17 @@ namespace AccountingSystem.Services
 
             var check = new Check
             {
-                UserId = model.UserId,
                 Items = itemsList,
                 Sum = Math.Round(totalSum, 2),
                 Date = DateTime.Now,
-                Profit = Math.Round(totalProfit, 2)
+                Profit = Math.Round(totalProfit, 2),
+                UserId=model.UserId
             };
 
             checks.InsertOne(check);
             return check;
         }
+
 
         public CheckDetailsViewModel GetCheckDetails(string id, string userId)
         {
@@ -81,14 +86,16 @@ namespace AccountingSystem.Services
                 return null;
             }
 
-            var itemsList = new List<Item>();
+            var itemsList = new List<OrderItemViewModel>();
             foreach (var orderItem in check.Items)
             {
-                var item = items.Find(i => i.Id == orderItem.Id).FirstOrDefault();
-                if (item != null)
+                itemsList.Add(new OrderItemViewModel
                 {
-                    itemsList.Add(item);
-                }
+                    Id = orderItem.Id,
+                    Name = orderItem.Name,
+                    Quantity = orderItem.Quantity,
+                    Price = orderItem.Price
+                });
             }
 
             return new CheckDetailsViewModel
@@ -97,6 +104,8 @@ namespace AccountingSystem.Services
                 Items = itemsList
             };
         }
+
+
 
         public void Delete(string id, string userId)
         {

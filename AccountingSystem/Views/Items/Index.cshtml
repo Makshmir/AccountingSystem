@@ -99,6 +99,20 @@
                 }
             }
         });
+
+        // Highlight prices lower than purchase prices
+        var rows = document.querySelectorAll('#MyTable tbody tr');
+        rows.forEach(function (row) {
+            var purchasePriceCell = row.querySelector('td:nth-child(5)');
+            var priceCell = row.querySelector('td:nth-child(6)');
+            if (purchasePriceCell && priceCell) {
+                var purchasePrice = parseFloat(purchasePriceCell.textContent);
+                var price = parseFloat(priceCell.textContent);
+                if (price < purchasePrice) {
+                    priceCell.style.color = 'red';
+                }
+            }
+        });
     });
 </script>
 

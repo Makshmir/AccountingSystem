@@ -15,9 +15,10 @@ namespace AccountingSystem.Models
     public class OrderItemViewModel
     {
         public string Id { get; set; }
-
-        [Range(0.1, Double.MaxValue, ErrorMessage = "Please enter a value bigger than {1}")]
+        public string Name { get; set; }
         public double Quantity { get; set; }
+        public double Price { get; set; } // Додано поле для зберігання ціни
+        public double TotalPrice => Price * Quantity;
     }
 
 }

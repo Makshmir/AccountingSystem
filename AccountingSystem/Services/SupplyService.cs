@@ -1,7 +1,8 @@
-﻿using MongoDB.Driver;
-using AccountingSystem.Models;
-using System.Collections.Generic;
+﻿using AccountingSystem.Models;
 using Microsoft.Extensions.Configuration;
+using MongoDB.Driver;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace AccountingSystem.Services
 {
@@ -13,7 +14,7 @@ namespace AccountingSystem.Services
         {
             MongoClient client = new MongoClient(config.GetConnectionString("AccountingDb"));
             IMongoDatabase database = client.GetDatabase("AccountingDb");
-            supplies = database.GetCollection<Supply>("Supplies");
+            supplies = database.GetCollection<Supply>("supplies");
         }
 
         public List<Supply> GetByUserId(string userId)
@@ -34,7 +35,8 @@ namespace AccountingSystem.Services
 
         public void Update(string id, Supply supplyIn)
         {
-            supplies.ReplaceOne(supply => supply.Id == id && supply.UserId == supplyIn.UserId, supplyIn);
+            Console.WriteLine(supplyIn.SupplyDate);
+            supplies.ReplaceOne(supply => supply.Id == id, supplyIn);
         }
 
         public void Remove(string id, string userId)

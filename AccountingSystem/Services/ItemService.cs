@@ -41,6 +41,16 @@ namespace AccountingSystem.Services
             items.ReplaceOne(item => item.Id == id && item.UserId == userId, itemIn);
         }
 
+        public void UpdateQuantity(string itemId, int quantity, string userId)
+        {
+            var item = items.Find<Item>(i => i.Id == itemId && i.UserId == userId).FirstOrDefault();
+            if (item != null)
+            {
+                item.Available += quantity;
+                items.ReplaceOne(i => i.Id == itemId && i.UserId == userId, item);
+            }
+        }
+
         public void UpdateQuantityAndPurchasePrice(string itemId, int quantity, double purchasePrice, string userId)
         {
             var item = items.Find<Item>(i => i.Id == itemId && i.UserId == userId).FirstOrDefault();
@@ -48,15 +58,7 @@ namespace AccountingSystem.Services
             {
                 item.Available += quantity;
                 item.PurchPrice = purchasePrice;
-                item.MarkupPriceNumeric = Math.Round(item.Price - item.PurchPrice, 2);
-                item.MarkupPriceInterest = Math.Round((item.Price / item.PurchPrice - 1) * 100, 2);
-                var filter = Builders<Item>.Filter.Eq("Id", item.Id);
-                var update = Builders<Item>.Update
-                    .Set("Available", item.Available)
-                    .Set("PurchPrice", item.PurchPrice)
-                    .Set("MarkupPriceNumeric", item.MarkupPriceNumeric)
-                    .Set("MarkupPriceInterest", item.MarkupPriceInterest);
-                items.UpdateOne(filter, update);
+                items.ReplaceOne(i => i.Id == itemId && i.UserId == userId, item);
             }
         }
 

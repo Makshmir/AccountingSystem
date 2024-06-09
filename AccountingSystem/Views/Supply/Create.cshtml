@@ -20,16 +20,16 @@
         document.getElementById("date").defaultValue = todayDate;
     };
 </script>
-<h1>Create Supply</h1>
+<h1>Створити поставку</h1>
 
-<h4>Supply</h4>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" method="post">
+    <div class="col-md-8">
+        <form asp-action="Create" method="post" onsubmit="return validateForm()">
             <div class="form-group">
-                <label>Supplier</label>
-                <select asp-for="SupplierId" class="form-control">
+                <label>Постачальник</label>
+                <select asp-for="SupplierId" class="form-control" required>
+                    <option value="" disabled selected>Оберіть постачальника</option>
                     @foreach (var supplier in ViewBag.Suppliers)
                     {
                         <option value="@supplier.Id">@supplier.Name</option>
@@ -39,43 +39,57 @@
             </div>
 
             <div class="form-group">
-                <label>Supply Date</label>
-                <input asp-for="SupplyDate" class="form-control" onload="getDate()" type="date" id="date" />
+                <label>Дата поставки</label>
+                <input asp-for="SupplyDate" class="form-control" type="date" id="date" required />
                 <span asp-validation-for="SupplyDate" class="text-danger"></span>
             </div>
 
-            <h4>Items</h4>
+            <h4>Товари</h4>
             <input type="hidden" id="ItemCount" name="ItemCount" value="@itemCount" />
             <div id="supplyItems">
                 @for (int i = 0; i < itemCount; i++)
                 {
-                    <div class="form-group">
-                        <label>Item</label>
-                        <select class="form-control" name="Items[@i].ItemId">
+                    <div class="form-group supply-item" id="itemDiv_@i">
+                        <label>Товар</label>
+                        <select class="form-control" name="Items[@i].ItemId" required>
+                            <option value="" disabled selected>Виберіть товар</option>
                             @foreach (var item in items)
                             {
-                                <option value="@item.Id">@item.Name</option>
+                                <option value="@item.Id" data-purchprice="@item.PurchPrice">@item.Name</option>
                             }
                         </select>
                         <span asp-validation-for="Items[@i].ItemId" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>Quantity</label>
-                        <input class="form-control" type="number" name="Items[@i].Quantity" />
-                        <span asp-validation-for="Items[@i].Quantity" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label>Price</label>
-                        <input class="form-control" type="number" name="Items[@i].PurchasePrice" />
-                        <span asp-validation-for="Items[@i].PurchasePrice" class="text-danger"></span>
+
+                        <div class="quantity_price_block">
+                            <div class="form-group">
+                                <label>Кількість</label>
+                                <input class="form-control input_quantity_price" type="number" name="Items[@i].Quantity" min="1" required onchange="updateTotal();" />
+                                <span asp-validation-for="Items[@i].Quantity" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Ціна</label>
+                                <input class="form-control input_quantity_price" type="number" name="Items[@i].PurchasePrice" min="0.01" step="0.01" required onchange="highlightPrice(this); updateTotal();" />
+                                <span asp-validation-for="Items[@i].PurchasePrice" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Загальна сума товару</label>
+                                <input class="form-control total-item-amount" type="number" readonly />
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-danger" onclick="removeItem('itemDiv_@i', @i)">Видалити</button>
                     </div>
                 }
             </div>
 
-            <button type="button" id="addItem" class="btn btn-secondary">Add Item</button>
+            <div class="form-group">
+                <label>Загальна сума:</label>
+                <input type="number" id="totalAmount" class="form-control" readonly />
+            </div>
+
+            <button type="button" id="addItem" class="btn btn-secondary">Додати товар</button>
 
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <input type="submit" value="Створити поставку" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -87,54 +101,205 @@
 
 @section Scripts {
     <script type="text/javascript">
-        var items = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(items));
+        var items = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(ViewBag.Items));
         var itemCount = @itemCount;
 
         document.getElementById("addItem").addEventListener("click", function () {
             var supplyItemsDiv = document.getElementById("supplyItems");
 
             var newItemDiv = document.createElement("div");
-            newItemDiv.className = "form-group";
+            newItemDiv.className = "form-group supply-item";
+            newItemDiv.id = "itemDiv_" + itemCount;
 
             var itemLabel = document.createElement("label");
-            itemLabel.textContent = "Item";
+            itemLabel.textContent = "Товар";
             newItemDiv.appendChild(itemLabel);
 
             var itemSelect = document.createElement("select");
             itemSelect.className = "form-control";
             itemSelect.name = "Items[" + itemCount + "].ItemId";
+            itemSelect.required = true;
+
+            var defaultOption = document.createElement("option");
+            defaultOption.value = "";
+            defaultOption.textContent = "Виберіть товар";
+            defaultOption.disabled = true;
+            defaultOption.selected = true;
+            itemSelect.appendChild(defaultOption);
 
             items.forEach(function (item) {
                 var option = document.createElement("option");
                 option.value = item.Id;
                 option.textContent = item.Name;
+                option.setAttribute("data-purchprice", item.PurchPrice);
                 itemSelect.appendChild(option);
             });
 
             newItemDiv.appendChild(itemSelect);
 
+            var validationSpan1 = document.createElement("span");
+            validationSpan1.className = "text-danger";
+            validationSpan1.setAttribute("asp-validation-for", "Items[" + itemCount + "].ItemId");
+            newItemDiv.appendChild(validationSpan1);
+
+            var quantityPriceBlockDiv = document.createElement("div");
+            quantityPriceBlockDiv.className = "quantity_price_block";
+
+            var formGroupDiv1 = document.createElement("div");
+            formGroupDiv1.className = "form-group";
+
             var quantityLabel = document.createElement("label");
-            quantityLabel.textContent = "Quantity";
-            newItemDiv.appendChild(quantityLabel);
+            quantityLabel.textContent = "Кількість";
+            formGroupDiv1.appendChild(quantityLabel);
 
             var quantityInput = document.createElement("input");
-            quantityInput.className = "form-control";
+            quantityInput.className = "form-control input_quantity_price";
             quantityInput.name = "Items[" + itemCount + "].Quantity";
             quantityInput.type = "number";
-            newItemDiv.appendChild(quantityInput);
+            quantityInput.min = "1";
+            quantityInput.required = true;
+            quantityInput.onchange = function () {
+                updateTotal();
+            };
+            formGroupDiv1.appendChild(quantityInput);
 
-            var purchPrInput = document.createElement("input");
-            purchPrInput.className = "form-control";
-            purchPrInput.name = "Items[" + itemCount + "].PurchasePrice";
-            purchPrInput.type = "number";
-            newItemDiv.appendChild(purchPrInput);
+            var validationSpan2 = document.createElement("span");
+            validationSpan2.className = "text-danger";
+            validationSpan2.setAttribute("asp-validation-for", "Items[" + itemCount + "].Quantity");
+            formGroupDiv1.appendChild(validationSpan2);
 
+            quantityPriceBlockDiv.appendChild(formGroupDiv1);
+
+            var formGroupDiv2 = document.createElement("div");
+            formGroupDiv2.className = "form-group";
+
+            var priceLabel = document.createElement("label");
+            priceLabel.textContent = "Ціна";
+            formGroupDiv2.appendChild(priceLabel);
+
+            var priceInput = document.createElement("input");
+            priceInput.className = "form-control input_quantity_price";
+            priceInput.name = "Items[" + itemCount + "].PurchasePrice";
+            priceInput.type = "number";
+            priceInput.min = "0.01";
+            priceInput.step = "0.01";
+            priceInput.required = true;
+            priceInput.onchange = function () {
+                highlightPrice(this);
+                updateTotal();
+            };
+            formGroupDiv2.appendChild(priceInput);
+
+            var validationSpan3 = document.createElement("span");
+            validationSpan3.className = "text-danger";
+            validationSpan3.setAttribute("asp-validation-for", "Items[" + itemCount + "].PurchasePrice");
+            formGroupDiv2.appendChild(validationSpan3);
+
+            quantityPriceBlockDiv.appendChild(formGroupDiv2);
+
+            var formGroupDiv3 = document.createElement("div");
+            formGroupDiv3.className = "form-group";
+
+            var totalItemAmountLabel = document.createElement("label");
+            totalItemAmountLabel.textContent = "Загальна сума товару";
+            formGroupDiv3.appendChild(totalItemAmountLabel);
+
+            var totalItemAmountInput = document.createElement("input");
+            totalItemAmountInput.className = "form-control total-item-amount";
+            totalItemAmountInput.type = "number";
+            totalItemAmountInput.readOnly = true;
+            formGroupDiv3.appendChild(totalItemAmountInput);
+
+            quantityPriceBlockDiv.appendChild(formGroupDiv3);
+
+            newItemDiv.appendChild(quantityPriceBlockDiv);
+
+            var deleteButton = document.createElement("button");
+            deleteButton.type = "button";
+            deleteButton.className = "btn btn-danger";
+            deleteButton.textContent = "Видалити";
+            deleteButton.setAttribute("onclick", "removeItem('itemDiv_" + itemCount + "', " + itemCount + ")");
+            newItemDiv.appendChild(deleteButton);
 
             supplyItemsDiv.appendChild(newItemDiv);
 
             itemCount++;
             document.getElementById("ItemCount").value = itemCount;
         });
+
+        function removeItem(itemId, index) {
+            var item = document.getElementById(itemId);
+            if (item) {
+                item.remove();
+                itemCount--;
+
+                var items = document.querySelectorAll('.supply-item');
+                for (var i = 0; i < items.length; i++) {
+                    items[i].querySelector('select').name = "Items[" + i + "].ItemId";
+                    items[i].querySelector('input[name$="Quantity"]').name = "Items[" + i + "].Quantity";
+                    items[i].querySelector('input[name$="PurchasePrice"]').name = "Items[" + i + "].PurchasePrice";
+                }
+
+                document.getElementById("ItemCount").value = itemCount;
+                updateTotal();
+            }
+        }
+
+        function highlightPrice(input) {
+            var selectedOption = input.closest('.supply-item').querySelector('select').selectedOptions[0];
+            var purchPrice = parseFloat(selectedOption.getAttribute('data-purchprice'));
+            var price = parseFloat(input.value);
+            if (!isNaN(price) && price < purchPrice) {
+                input.style.backgroundColor = "red";
+            } else {
+                input.style.backgroundColor = "";
+            }
+        }
+
+        function updateTotal() {
+            var total = 0;
+            var supplyItems = document.querySelectorAll('.supply-item');
+
+            supplyItems.forEach(function (supplyItem) {
+                var quantityInput = supplyItem.querySelector('input[name$="Quantity"]');
+                var priceInput = supplyItem.querySelector('input[name$="PurchasePrice"]');
+                var totalItemAmountInput = supplyItem.querySelector('.total-item-amount');
+                var quantity = parseFloat(quantityInput.value);
+                var price = parseFloat(priceInput.value);
+
+                if (!isNaN(quantity) && !isNaN(price)) {
+                    var itemTotal = quantity * price;
+                    totalItemAmountInput.value = itemTotal.toFixed(2);
+                    total += itemTotal;
+                }
+            });
+
+            document.getElementById("totalAmount").value = total.toFixed(2);
+        }
+
+        function validateForm() {
+            var isValid = true;
+            var supplyItems = document.querySelectorAll('.supply-item');
+
+            supplyItems.forEach(function (supplyItem) {
+                var itemSelect = supplyItem.querySelector('select');
+                var quantityInput = supplyItem.querySelector('input[name$="Quantity"]');
+                var priceInput = supplyItem.querySelector('input[name$="PurchasePrice"]');
+
+                if (itemSelect.value.trim() === '' || quantityInput.value.trim() === '' || priceInput.value.trim() === '') {
+                    isValid = false;
+                    itemSelect.classList.add('is-invalid');
+                    quantityInput.classList.add('is-invalid');
+                    priceInput.classList.add('is-invalid');
+                } else {
+                    itemSelect.classList.remove('is-invalid');
+                    quantityInput.classList.remove('is-invalid');
+                    priceInput.classList.remove('is-invalid');
+                }
+            });
+
+            return isValid;
+        }
     </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
