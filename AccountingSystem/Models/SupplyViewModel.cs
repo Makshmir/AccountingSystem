@@ -12,7 +12,7 @@
     public class SupplyItemViewModel
     {
         public string ItemName { get; set; }
-        public int Quantity { get; set; }
+        public double Quantity { get; set; }
         public double PurchasePrice { get; set; }
         public double TotalPrice { get; set; }
     }

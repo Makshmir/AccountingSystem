@@ -78,7 +78,7 @@ namespace AccountingSystem.Controllers
                 var item = new SupplyItem
                 {
                     ItemId = form[$"Items[{i}].ItemId"],
-                    Quantity = Convert.ToInt32(form[$"Items[{i}].Quantity"]),
+                    Quantity = Convert.ToDouble(form[$"Items[{i}].Quantity"]),
                     PurchasePrice = Math.Round(Convert.ToDouble(form[$"Items[{i}].PurchasePrice"]),2)
                 };
                 model.Supply.TotalAmount += item.TotalPrice;

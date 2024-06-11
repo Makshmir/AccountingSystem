@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNet.Identity;
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -34,26 +35,45 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Supply" asp-action="Index">Постачання</a>
                         </li>
+                        @if (User.Identity.GetUserId() == "google-oauth2|105690006189469913035")
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Notification" asp-action="Index">Сповіщення</a>
+                            </li>
+                        }
+                    </ul>
+
+                    <div class="account_div">
+                        <ul class="navbar-nav flex-grow-1">
+                            @if (User.Identity.IsAuthenticated)
+                            {
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
+                                </li>
+                            }
+                            else
+                            {
+                                <li>
+                                    <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Login</a>
+                                </li>
+                            }
                         </ul>
+                    </div>
 
-                        <div class="account_div">
-                            <ul class="navbar-nav flex-grow-1">
-                                @if (User.Identity.IsAuthenticated)
-                                {
-                                    <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Logout">Logout</a>
-
-                                    </li>
-                                }
-                                else
-                                {
-                                    <li>
-                                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Login">Login</a>
-                                    </li>
-                                }
-                            </ul>
-                        </div>
-                    
+                    <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                        <ul class="navbar-nav flex-grow-1">
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="notificationsDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    Сповіщення <span class="badge badge-pill badge-danger notification_count" id="notificationCount"></span>
+                                </a>
+                                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="notificationsDropdown">
+                                    <div id="notificationsContainer">
+                                        <p class="dropdown-item">Завантаження...</p>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -69,9 +89,44 @@
             &copy; 2024 - AccountingSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer>
+
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                url: '@Url.Action("GetNotifications", "Notification")',
+                method: 'GET',
+                success: function (data) {
+                    var container = $('#notificationsContainer');
+                    container.empty();
+                    if (data.length > 0) {
+                        data.forEach(function (notification) {
+                            var item = $('<a class="dropdown-item"></a>').attr('href', '/Notification/Details/' + notification.id).text(notification.message);
+                            container.append(item);
+                        });
+                    } else {
+                        container.append($('<p class="dropdown-item"></p>').text('Немає нових сповіщень'));
+                    }
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+
+            $.ajax({
+                url: '@Url.Action("GetNotificationCount", "Notification")',
+                method: 'GET',
+                success: function (data) {
+                    $('#notificationCount').text(data);
+                },
+                error: function (xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

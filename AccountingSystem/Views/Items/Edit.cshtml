@@ -54,13 +54,13 @@
             <div class="input_group">
                 <div class="form-group">
                     <label> Ціна закупівлі</label>
-                    <input asp-for="Item.PurchPrice" type="number" class="form-control" />
+                    <input asp-for="Item.PurchPrice" type="number" class="form-control" id="purchPrice" />
                     <span asp-validation-for="Item.PurchPrice" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
                     <label> Ціна продажу</label>
-                    <input asp-for="Item.Price" type="number" class="form-control" />
+                    <input asp-for="Item.Price" type="number" class="form-control" id="price" />
                     <span asp-validation-for="Item.Price" class="text-danger"></span>
                 </div>
             </div>
@@ -68,13 +68,13 @@
             <div class="input_group">
                 <div class="form-group">
                     <label> Націнка</label>
-                    <input asp-for="Item.MarkupPriceNumeric" readonly type="number" class="form-control" />
+                    <input asp-for="Item.MarkupPriceNumeric" readonly type="number" class="form-control" id="markupPriceNumeric" />
                     <span asp-validation-for="Item.MarkupPriceNumeric" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
                     <label>Націнка %</label>
-                    <input asp-for="Item.MarkupPriceInterest" readonly type="number" class="form-control" />
+                    <input asp-for="Item.MarkupPriceInterest" readonly type="number" class="form-control" id="markupPriceInterest" />
                     <span asp-validation-for="Item.MarkupPriceInterest" class="text-danger"></span>
                 </div>
             </div>
@@ -109,7 +109,26 @@
 </div>
 
 @section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
-    }
+    <partial name="_ValidationScriptsPartial" />
+
+    <script type="text/javascript">
+        function updateMarkup() {
+            var purchPrice = parseFloat(document.getElementById("purchPrice").value) || 0;
+            var price = parseFloat(document.getElementById("price").value) || 0;
+            var markupPriceNumeric = document.getElementById("markupPriceNumeric");
+            var markupPriceInterest = document.getElementById("markupPriceInterest");
+
+            var markup = price - purchPrice;
+            var markupPercent = (purchPrice !== 0) ? ((markup / purchPrice) * 100) : 0;
+
+            markupPriceNumeric.value = markup.toFixed(2);
+            markupPriceInterest.value = markupPercent.toFixed(2);
+        }
+
+        document.getElementById("purchPrice").addEventListener("input", updateMarkup);
+        document.getElementById("price").addEventListener("input", updateMarkup);
+
+        // Initialize markup values on page load
+        updateMarkup();
+    </script>
 }

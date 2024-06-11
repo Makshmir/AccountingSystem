@@ -1,0 +1,44 @@
+﻿@model AccountingSystem.Models.Notification
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+
+<div>
+    <h4>Сповіщення</h4>
+    <hr />
+    <dl class="row">
+
+
+        <dd class="col-sm-10">
+            <h1>@Model.Message</h1>
+        </dd>
+
+      
+        <dd class="col-sm-10">
+            <h2>Дата події: @Model.EventDate.ToShortDateString()</h2>
+        </dd>
+        <dt class="col-sm-4 categories_text">
+            <h3>Популярні категорії</h3>
+        </dt>
+        <dd class="col-sm-10 categories_block">
+                
+
+
+
+            @foreach (var category in Model.Categories)
+            {
+                <div class="category_item">
+                    <p>@category</p>
+                </div>
+
+                <br />
+            }
+        </dd>
+
+    </dl>
+</div>
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>

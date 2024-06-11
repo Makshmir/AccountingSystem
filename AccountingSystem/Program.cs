@@ -13,6 +13,8 @@ builder.Services.AddScoped<ItemService>();
 builder.Services.AddScoped<CheckService>();
 builder.Services.AddScoped<SupplierService>();
 builder.Services.AddScoped<SupplyService>();
+builder.Services.AddScoped<NotificationService>();
+
 
 // Configure Auth0
 builder.Services.AddAuthentication(options =>

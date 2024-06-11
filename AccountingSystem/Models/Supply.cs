@@ -28,7 +28,7 @@ namespace AccountingSystem.Models
         public string ItemId { get; set; }
         [Required]
         [Range(1, int.MaxValue, ErrorMessage = "Кількість повинна бути більше 0")]
-        public int Quantity { get; set; }
+        public double Quantity { get; set; }
         [Required]
         [Range(0.01, double.MaxValue, ErrorMessage = "Ціна повинна бути більше 0")]
         public double PurchasePrice { get; set; }

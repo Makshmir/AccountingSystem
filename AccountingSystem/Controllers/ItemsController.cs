@@ -107,6 +107,8 @@ namespace AccountingSystem.Controllers
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
+            item.MarkupPriceNumeric = item.Price - item.PurchPrice;
+            item.MarkupPriceInterest=Math.Round((item.Price / item.PurchPrice *100),2);
             if (ModelState.IsValid)
             {
                 item.UserId = userId;

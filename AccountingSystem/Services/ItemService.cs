@@ -41,7 +41,7 @@ namespace AccountingSystem.Services
             items.ReplaceOne(item => item.Id == id && item.UserId == userId, itemIn);
         }
 
-        public void UpdateQuantity(string itemId, int quantity, string userId)
+        public void UpdateQuantity(string itemId, double quantity, string userId)
         {
             var item = items.Find<Item>(i => i.Id == itemId && i.UserId == userId).FirstOrDefault();
             if (item != null)
@@ -51,7 +51,7 @@ namespace AccountingSystem.Services
             }
         }
 
-        public void UpdateQuantityAndPurchasePrice(string itemId, int quantity, double purchasePrice, string userId)
+        public void UpdateQuantityAndPurchasePrice(string itemId, double quantity, double purchasePrice, string userId)
         {
             var item = items.Find<Item>(i => i.Id == itemId && i.UserId == userId).FirstOrDefault();
             if (item != null)
