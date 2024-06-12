@@ -7,6 +7,42 @@
 <script type="text/javascript">
     var itemIndex = 1; // Початковий індекс для доданих товарів
 
+    var items = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Items));
+
+    function updateFieldsById(itemId, nameSelect, barcodeSelect) {
+        var item = items.find(i => i.Id === itemId);
+        if (item) {
+            nameSelect.value = item.Id;
+            barcodeSelect.value = item.Barcode;
+        }
+    }
+
+    function updateFieldsByBarcode(itemBarcode, nameSelect, barcodeSelect) {
+        var item = items.find(i => i.Barcode === itemBarcode);
+        if (item) {
+            nameSelect.value = item.Id;
+            barcodeSelect.value = item.Barcode;
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.select_item_to_sell').forEach(function (select) {
+            select.addEventListener('change', function () {
+                var itemId = this.value;
+                var barcodeSelect = this.parentElement.querySelector('.select_item_to_sell_barcode');
+                updateFieldsById(itemId, this, barcodeSelect);
+            });
+        });
+
+        document.querySelectorAll('.select_item_to_sell_barcode').forEach(function (select) {
+            select.addEventListener('change', function () {
+                var itemBarcode = this.value;
+                var nameSelect = this.parentElement.querySelector('.select_item_to_sell');
+                updateFieldsByBarcode(itemBarcode, nameSelect, this);
+            });
+        });
+    });
+
     function createNewElement() {
         var lastSelect = document.querySelector('.select_item_to_sell:last-of-type');
 
@@ -15,32 +51,45 @@
         }
 
         var txtNewInputBox = document.createElement('div');
-        txtNewInputBox.className = "form-group";
+        txtNewInputBox.className = "element_to_check";
         txtNewInputBox.id = `element${itemIndex}`;
-
         txtNewInputBox.innerHTML = `
-                <select class="select_item_to_sell" onchange="updateMax(this); updateTotal();">
+                <select name="Items[${itemIndex}].Barcode" class="select_item_to_sell_barcode form-control" onchange="updateFieldsByBarcode(this.value, document.querySelector('#element${itemIndex} .select_item_to_sell'), this); updateMax(this); updateTotal();">
                     <option></option>
-    @foreach (var item in Model.Items)
-    {
-                            <option value="@item.Id" data-price="@item.Price" data-available="@item.Available">
-            @item.Name - @item.Price грн - @item.Available @item.Unit
-                            </option>
-    }
+                    ${items.map(item => `
+                        <option value="${item.Barcode}" data-price="${item.DiscountedPrice}" data-available="${item.Available}">
+                            ${item.Barcode}
+                        </option>
+                    `).join('')}
                 </select>
-                <input type="number" class="item_quantity_input" step="1" min="1" value="0" oninput="updateTotal();" />
-                <button type="button" class="delete_btn" onclick="deleteElement('element${itemIndex}'); updateTotal();">Видалити</button>`;
+
+                <select name="Items[${itemIndex}].Id" class="select_item_to_sell form-control" onchange="updateFieldsById(this.value, this, document.querySelector('#element${itemIndex} .select_item_to_sell_barcode')); updateMax(this); updateTotal();">
+                    <option></option>
+                    ${items.map(item => `
+                        <option value="${item.Id}" data-price="${item.DiscountedPrice}" data-available="${item.Available}">
+                            ${item.Name} - ${item.DiscountedPrice} грн - ${item.Available} ${item.Unit}
+                        </option>
+                    `).join('')}
+                </select>
+
+                <input type="number" name="Items[${itemIndex}].Quantity" class="item_quantity_input form-control" step="0.1" min="0.1" value="0" oninput="updateTotal();" />
+                <button type="button" class="delete_btn btn btn-danger" onclick="deleteElement('element${itemIndex}'); updateTotal();">Видалити</button>`;
 
         document.getElementById("inputFields").appendChild(txtNewInputBox);
         itemIndex++;
         updateIndexes();
+        addEventListeners(txtNewInputBox); // Додаємо обробники подій для нових елементів
     }
 
     function updateMax(select) {
         var selectedOption = select.options[select.selectedIndex];
-        var availableQuantity = parseInt(selectedOption.getAttribute('data-available'));
-        var quantityInput = select.nextElementSibling;
-        quantityInput.max = availableQuantity;
+        if (selectedOption) {
+            var availableQuantity = parseInt(selectedOption.getAttribute('data-available'));
+            var quantityInput = select.nextElementSibling;
+            if (quantityInput) {
+                quantityInput.max = availableQuantity;
+            }
+        }
     }
 
     function deleteElement(elementId) {
@@ -54,12 +103,15 @@
         updateTotal(); // Оновити загальну суму після видалення елемента
     }
 
+
     function updateIndexes() {
-        var elements = document.querySelectorAll('.form-group');
+        var elements = document.querySelectorAll('.element_to_check');
         elements.forEach(function (element, index) {
-            var select = element.querySelector('.select_item_to_sell');
+            var nameSelect = element.querySelector('.select_item_to_sell');
+            var barcodeSelect = element.querySelector('.select_item_to_sell_barcode');
             var quantityInput = element.querySelector('.item_quantity_input');
-            select.name = `Items[${index}].Id`;
+            nameSelect.name = `Items[${index}].Id`;
+            barcodeSelect.name = `Items[${index}].Barcode`;
             quantityInput.name = `Items[${index}].Quantity`;
         });
     }
@@ -67,17 +119,66 @@
     function updateTotal() {
         var total = 0;
         var items = document.querySelectorAll('.select_item_to_sell');
+        var isValid = true;
+
         items.forEach(function (item) {
             var selectedOption = item.options[item.selectedIndex];
-            var price = parseFloat(selectedOption.getAttribute('data-price'));
-            var quantityInput = item.nextElementSibling;
-            var quantity = parseFloat(quantityInput.value);
-            if (!isNaN(price) && !isNaN(quantity)) {
-                total += price * quantity;
+            if (selectedOption) {
+                var price = parseFloat(selectedOption.getAttribute('data-price'));
+                var quantityInput = item.nextElementSibling.nextElementSibling;
+                if (quantityInput) {
+                    var quantity = parseFloat(quantityInput.value);
+                    if (!isNaN(price) && !isNaN(quantity)) {
+                        total += price * quantity;
+                    }
+                }
+            }
+            if (item.value === '' || item.nextElementSibling.value === '') {
+                isValid = false;
             }
         });
-        document.querySelector('.total_input').value = total.toFixed(2);
+
+        var totalInput = document.querySelector('.total_input');
+        if (totalInput) {
+            totalInput.value = total.toFixed(2);
+        }
+
+        var submitButton = document.querySelector('.submit_button');
+        if (submitButton) {
+            submitButton.disabled = !isValid;
+        }
     }
+
+    function addEventListeners(element) {
+        var nameSelect = element.querySelector('.select_item_to_sell');
+        var barcodeSelect = element.querySelector('.select_item_to_sell_barcode');
+        var quantityInput = element.querySelector('.item_quantity_input');
+
+        if (nameSelect) {
+            nameSelect.addEventListener('change', function () {
+                var itemId = this.value;
+                updateFieldsById(itemId, nameSelect, barcodeSelect);
+                updateTotal();
+            });
+        }
+
+        if (barcodeSelect) {
+            barcodeSelect.addEventListener('change', function () {
+                var itemBarcode = this.value;
+                updateFieldsByBarcode(itemBarcode, nameSelect, barcodeSelect);
+                updateTotal();
+            });
+        }
+
+        if (quantityInput) {
+            quantityInput.addEventListener('input', updateTotal);
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.element_to_check').forEach(addEventListeners);
+        updateTotal(); // Ініціалізація валідації під час завантаження сторінки
+    });
 </script>
 
 <div class="container">
@@ -89,34 +190,45 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div id="inputFields">
-                <div class="form-group" id="element0">
-                    <select name="Items[0].Id" class="select_item_to_sell" onchange="updateMax(this); updateTotal();">
+                <div class="element_to_check" id="element0">
+                    <select name="Items[0].Barcode" class="select_item_to_sell_barcode form-control" onchange="updateFieldsByBarcode(this.value, document.querySelector('#element0 .select_item_to_sell'), this); updateMax(this); updateTotal();">
                         <option></option>
                         @foreach (var item in Model.Items)
                         {
-                            <option value="@item.Id" data-price="@item.Price" data-available="@item.Available">
-                                @item.Name - @item.Price грн - @item.Available @item.Unit
+                            <option value="@item.Barcode" data-price="@item.DiscountedPrice" data-available="@item.Available">
+                                @item.Barcode
                             </option>
                         }
                     </select>
-                    <input type="number" name="Items[0].Quantity" class="item_quantity_input" step="0.1" min="0.1" value="0" oninput="updateTotal();" />
-                    <button type="button" class="delete_btn" onclick="deleteElement('element0'); updateTotal();">Видалити</button>
+
+                    <select name="Items[0].Id" class="select_item_to_sell form-control" onchange="updateFieldsById(this.value, this, document.querySelector('#element0 .select_item_to_sell_barcode')); updateMax(this); updateTotal();">
+                        <option></option>
+                        @foreach (var item in Model.Items)
+                        {
+                            <option value="@item.Id" data-price="@item.DiscountedPrice" data-available="@item.Available">
+                                @item.Name - @item.DiscountedPrice грн - @item.Available @item.Unit
+                            </option>
+                        }
+                    </select>
+
+                    <input type="number" name="Items[0].Quantity" class="item_quantity_input form-control" step="0.1" min="0.1" value="0" oninput="updateTotal();" />
+                    <button type="button" class="delete_btn btn btn-danger" onclick="deleteElement('element0'); updateTotal();">Видалити</button>
                 </div>
             </div>
             <div id="dynamicCheck">
-                <input type="button" value="Додати" onclick="createNewElement();" class="add_button" />
+                <input type="button" value="Додати" onclick="createNewElement();" class="add_button btn btn-primary" />
             </div>
-            <button type="submit" class="submit_button">Створити</button>
+            <button type="submit" class="submit_button btn btn-success">Створити</button>
         </form>
     </div>
 
     <div class="sum">
         <p>Усього:</p>
-        <input type="number" readonly value="0" class="total_input" />
+        <input type="number" readonly value="0" class="total_input form-control" />
     </div>
 
     <div>
-        <a asp-action="Index" class="back_link">Back to List</a>
+        <a asp-action="Index" class="back_link">Повернутись</a>
     </div>
 </div>
 

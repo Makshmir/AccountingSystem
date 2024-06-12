@@ -8,6 +8,11 @@ namespace AccountingSystem.Services
 {
     public class CheckService
     {
+        public class SalesCategoryData
+        {
+            public string Category { get; set; }
+            public double TotalSales { get; set; }
+        }
         private readonly IMongoCollection<Check> checks;
         private readonly IMongoCollection<Item> items;
 
@@ -18,6 +23,9 @@ namespace AccountingSystem.Services
             checks = database.GetCollection<Check>("Checks");
             items = database.GetCollection<Item>("items");
         }
+
+
+
 
         public List<Check> GetByUserId(string userId)
         {
@@ -43,7 +51,7 @@ namespace AccountingSystem.Services
                     if (orderItem.Quantity <= item.Available)
                     {
                         // Зберігаємо ціну товару в orderItem
-                        orderItem.Price = item.Price;
+                        orderItem.Price = item.DiscountedPrice;
                         orderItem.Name = item.Name;
 
                         double itemTotal = Math.Round(orderItem.Quantity * orderItem.Price, 2);

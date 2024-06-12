@@ -5,7 +5,7 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>Цінник</h1>
 
 
     <hr />
@@ -13,21 +13,32 @@
 
         <div class="element_row">
             <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Name)
+                <h5>@Html.DisplayNameFor(model => model.Name)</h5>
             </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Name)
+            <dd class="col-sm-4">
+                <h4 class="h3_name">@Html.DisplayFor(model => model.Name)</h4>
             </dd>
         </div>
 
-        <div class="element_row">
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Price)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Price)
-            </dd>
-        </div>
+
+    <div class="element_row">
+
+        <dd class="col-sm-10">
+            @{
+                if (Model.Discount != 0)
+                {
+                    <s>@Html.DisplayFor(model => model.Price) грн</s>
+
+                }
+            
+                
+            }
+            
+            
+            <h2>@Html.DisplayFor(model => model.DiscountedPrice)</h2>
+            <h4>грн</h4>
+        </dd>
+    </div>
         
         @{
             IronBarCode.GeneratedBarcode myBarcode = IronBarCode.BarcodeWriter.CreateBarcode(Model.Barcode, IronBarCode.BarcodeEncoding.Code128);
@@ -49,5 +60,5 @@
 </div>
 <div>
     @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Повернутись</a>
 </div>

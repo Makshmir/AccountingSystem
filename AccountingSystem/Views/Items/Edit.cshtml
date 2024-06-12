@@ -4,12 +4,12 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
+<h1>Редагувати</h1>
 
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" class="edit_form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
             <input type="hidden" asp-for="Item.Id" />
@@ -64,7 +64,19 @@
                     <span asp-validation-for="Item.Price" class="text-danger"></span>
                 </div>
             </div>
+            <div class="input_group">
+                <div class="form-group">
+                    <label>Знижка (%)</label>
+                    <input asp-for="Item.Discount" type="number" class="form-control" id="discount" />
+                    <span asp-validation-for="Item.Discount" class="text-danger"></span>
+                </div>
 
+                <div class="form-group">
+                    <label>Ціна після знижки</label>
+                    <input asp-for="Item.DiscountedPrice" type="number" class="form-control" readonly id="discountedPrice" />
+                    <span asp-validation-for="Item.DiscountedPrice" class="text-danger"></span>
+                </div>
+            </div>
             <div class="input_group">
                 <div class="form-group">
                     <label> Націнка</label>
@@ -105,30 +117,58 @@
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a asp-action="Index">Повернутись</a>
 </div>
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
     <script type="text/javascript">
-        function updateMarkup() {
-            var purchPrice = parseFloat(document.getElementById("purchPrice").value) || 0;
-            var price = parseFloat(document.getElementById("price").value) || 0;
-            var markupPriceNumeric = document.getElementById("markupPriceNumeric");
-            var markupPriceInterest = document.getElementById("markupPriceInterest");
+        document.addEventListener('DOMContentLoaded', function () {
+            var priceInput = document.querySelector('input[name="Item.Price"]');
+            var discountInput = document.querySelector('input[name="Item.Discount"]');
+            var discountedPriceInput = document.querySelector('input[name="Item.DiscountedPrice"]');
+            var purchPriceInput = document.querySelector('input[name="Item.PurchPrice"]');
+            var markupPriceNumericInput = document.querySelector('input[name="Item.MarkupPriceNumeric"]');
+            var markupPriceInterestInput = document.querySelector('input[name="Item.MarkupPriceInterest"]');
 
-            var markup = price - purchPrice;
-            var markupPercent = (purchPrice !== 0) ? ((markup / purchPrice) * 100) : 0;
+            function updateDiscountedPrice() {
+                var price = parseFloat(priceInput.value);
+                var discount = parseFloat(discountInput.value);
+                if (!isNaN(price) && !isNaN(discount)) {
+                    var discountedPrice = price - (price * (discount / 100));
+                    discountedPriceInput.value = discountedPrice.toFixed(2);
+                    updateMarkup(discountedPrice);
+                } else {
+                    discountedPriceInput.value = '';
+                }
+            }
 
-            markupPriceNumeric.value = markup.toFixed(2);
-            markupPriceInterest.value = markupPercent.toFixed(2);
-        }
+            function updateMarkup(discountedPrice) {
+                var purchPrice = parseFloat(purchPriceInput.value);
+                if (!isNaN(discountedPrice) && !isNaN(purchPrice)) {
+                    var markup = discountedPrice - purchPrice;
+                    var markupPercent = (purchPrice !== 0) ? ((markup / purchPrice) * 100) : 0;
 
-        document.getElementById("purchPrice").addEventListener("input", updateMarkup);
-        document.getElementById("price").addEventListener("input", updateMarkup);
+                    markupPriceNumericInput.value = markup.toFixed(2);
+                    markupPriceInterestInput.value = markupPercent.toFixed(2);
+                } else {
+                    markupPriceNumericInput.value = '';
+                    markupPriceInterestInput.value = '';
+                }
+            }
 
-        // Initialize markup values on page load
-        updateMarkup();
+            priceInput.addEventListener('input', updateDiscountedPrice);
+            discountInput.addEventListener('input', updateDiscountedPrice);
+            purchPriceInput.addEventListener('input', function () {
+                var discountedPrice = parseFloat(discountedPriceInput.value);
+                if (!isNaN(discountedPrice)) {
+                    updateMarkup(discountedPrice);
+                }
+            });
+
+            // Initialize on load
+            updateDiscountedPrice();
+        });
     </script>
 }

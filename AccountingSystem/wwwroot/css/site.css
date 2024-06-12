@@ -543,3 +543,21 @@ a.btn-back {
 .categories_text{
     text-align:center;
 }
+.item-name{
+    width:30%;
+}
+
+.select_item_to_sell_barcode {
+    width: 35%;
+    margin: 0px 0px 0px 10px;
+}
+.select_item_to_sell_name{
+    width:35%;
+    margin:0px 0px 0px 10px;
+}
+.element_to_check {
+    display: flex;
+}
+.flex-nav-bar {
+    flex-grow: 3;
+}

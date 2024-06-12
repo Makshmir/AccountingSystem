@@ -1,0 +1,52 @@
+﻿@model IEnumerable<AccountingSystem.Models.Item>
+
+@{
+    ViewData["Title"] = "Apply Discounts";
+}
+
+<h1>Apply Discounts</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="ApplyDiscounts" method="post">
+            <div class="form-group">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Price</th>
+                            <th>Discount (%)</th>
+                            <th>Discounted Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @for (int i = 0; i < Model.Count(); i++)
+                        {
+                            <tr>
+                                <td>@Model.ElementAt(i).Name</td>
+                                <td>@Model.ElementAt(i).Category</td>
+                                <td>@Model.ElementAt(i).Price</td>
+                                <td>
+                                    <input type="number" name="[@i].Discount" value="@Model.ElementAt(i).Discount" class="form-control" />
+                                </td>
+                                <td>
+                                    <input type="number" name="[@i].DiscountedPrice" value="@Model.ElementAt(i).DiscountedPrice" readonly class="form-control" />
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Apply Discounts" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Повернутись</a>
+</div>

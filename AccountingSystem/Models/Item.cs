@@ -63,5 +63,10 @@ namespace AccountingSystem.Models
         [BsonElement("SupplierId")]
         [Required]
         public string SupplierId { get; set; }
+
+
+        // New attributes
+        public double Discount { get; set; }
+        public double DiscountedPrice { get; set; }
     }
 }

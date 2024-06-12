@@ -36,7 +36,7 @@ namespace AccountingSystem.Services
 
         public void Update(string id, Item itemIn, string userId)
         {
-            itemIn.MarkupPriceNumeric = Math.Round(itemIn.Price - itemIn.PurchPrice, 2);
+            itemIn.MarkupPriceNumeric = Math.Round(itemIn.DiscountedPrice - itemIn.PurchPrice, 2);
             itemIn.MarkupPriceInterest = Math.Round((itemIn.Price / itemIn.PurchPrice - 1) * 100, 2);
             items.ReplaceOne(item => item.Id == id && item.UserId == userId, itemIn);
         }
@@ -70,6 +70,13 @@ namespace AccountingSystem.Services
         public void Remove(string id, string userId)
         {
             items.DeleteOne(item => item.Id == id && item.UserId == userId);
+        }
+        public void UpdateDiscounts(IEnumerable<Item> itemIn)
+        {
+            foreach (var item in itemIn)
+            {
+                items.ReplaceOne(i => i.Id == item.Id, item);
+            }
         }
     }
 }

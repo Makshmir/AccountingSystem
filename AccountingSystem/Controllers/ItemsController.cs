@@ -78,6 +78,7 @@ namespace AccountingSystem.Controllers
 
             model.Items.MarkupPriceNumeric = Math.Round((model.Items.Price - model.Items.PurchPrice), 2);
             model.Items.MarkupPriceInterest = Math.Round((model.Items.Price / model.Items.PurchPrice - 1) * 100);
+            model.Items.DiscountedPrice = model.Items.Price;
 
             itemService.Create(model.Items);
             return RedirectToAction(nameof(Index));
@@ -173,5 +174,73 @@ namespace AccountingSystem.Controllers
                 return View();
             }
         }
+
+        [HttpPost]
+        public IActionResult GenerateRandomDiscounts()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var items = itemService.GetByUserId(userId);
+            var random = new Random();
+
+            foreach (var item in items)
+            {
+                if (item.Price <= item.PurchPrice)
+                {
+                    // Якщо ціна продажу вже нижче або дорівнює ціні закупівлі, знижку не встановлюємо
+                    item.Discount = 0;
+                    item.DiscountedPrice = item.Price;
+                }
+                else
+                {
+                    // Визначаємо максимальну можливу знижку, щоб знижена ціна не була нижчою за закупівельну ціну + 10% націнки
+                    var maxDiscount = (int)Math.Floor(100 * (1 - (item.PurchPrice * 1.1) / item.Price));
+
+                    // Якщо максимальна можлива знижка менше 5%, знижку не встановлюємо
+                    if (maxDiscount < 5)
+                    {
+                        item.Discount = 0;
+                        item.DiscountedPrice = item.Price;
+                    }
+                    else
+                    {
+                        // Генеруємо випадкову знижку в межах від 5% до maxDiscount%
+                        var discount = random.Next(5, Math.Min(31, maxDiscount + 1));
+                        var discountedPrice = Math.Round(item.Price - (item.Price * (discount / 100.0)), 2);
+
+                        item.Discount = discount;
+                        item.DiscountedPrice = discountedPrice;
+                    }
+                }
+
+                // Оновлюємо націнку
+                item.MarkupPriceNumeric = Math.Round(item.DiscountedPrice - item.PurchPrice, 2);
+                item.MarkupPriceInterest = Math.Round((item.PurchPrice != 0) ? ((item.MarkupPriceNumeric / item.PurchPrice) * 100) : 0, 2);
+
+                itemService.Update(item.Id, item, userId);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+        [HttpPost]
+        public IActionResult RemoveAllDiscounts()
+        {
+            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
+            var items = itemService.GetByUserId(userId);
+
+            foreach (var item in items)
+            {
+                item.Discount = 0;
+                item.DiscountedPrice = item.Price;  // Повертаємо до початкової ціни
+                itemService.Update(item.Id, item, userId);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
+
     }
 }

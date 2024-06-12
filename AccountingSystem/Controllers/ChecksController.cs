@@ -1,10 +1,7 @@
 ﻿using AccountingSystem.Models;
 using AccountingSystem.Services;
-using IronBarCode;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Dynamic;
 using System.Security.Claims;
 
