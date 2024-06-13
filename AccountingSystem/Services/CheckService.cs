@@ -8,11 +8,10 @@ namespace AccountingSystem.Services
 {
     public class CheckService
     {
-        public class SalesCategoryData
-        {
-            public string Category { get; set; }
-            public double TotalSales { get; set; }
-        }
+        
+
+
+
         private readonly IMongoCollection<Check> checks;
         private readonly IMongoCollection<Item> items;
 
@@ -22,6 +21,48 @@ namespace AccountingSystem.Services
             IMongoDatabase database = client.GetDatabase("AccountingDb");
             checks = database.GetCollection<Check>("Checks");
             items = database.GetCollection<Item>("items");
+        }
+
+        public (List<SalesCategoryData> salesCategoryData, SalesSummaryData salesSummaryData) GetSalesSummaryByCategory(string userId, DateTime? startDate, DateTime? endDate)
+        {
+            var query = checks.Find(c => c.UserId == userId).ToEnumerable();
+
+            if (startDate.HasValue)
+            {
+                query = query.Where(c => c.Date >= startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                query = query.Where(c => c.Date <= endDate.Value);
+            }
+
+            var salesCategoryData = query.SelectMany(c => c.Items)
+                                         .Where(i => !string.IsNullOrEmpty(i.Category))
+                                         .GroupBy(i => i.Category)
+                                         .Select(g => new SalesCategoryData
+                                         {
+                                             Category = g.Key,
+                                             TotalSales = Math.Round(g.Sum(i => i.TotalPrice)),
+                                             TotalProfit = Math.Round(g.Sum(i => i.Quantity * (i.Price - i.PurchasePrice))),
+                                             SalesCount = g.Sum(i => (int)i.Quantity)
+                                         })
+                                         .ToList();
+
+            var totalSalesCount = query.Sum(c => c.Items.Sum(i => (int)i.Quantity));
+            var totalSalesAmount = query.Sum(c => c.Sum);
+            var totalProfit = query.Sum(c => c.Profit);
+            var averageCheck = query.Any() ? query.Average(c => c.Sum) : 0;
+
+            var salesSummaryData = new SalesSummaryData
+            {
+                TotalSalesCount = totalSalesCount,
+                TotalSalesAmount = Math.Round(totalSalesAmount),
+                TotalProfit = Math.Round(totalProfit),
+                AverageCheck = Math.Round(averageCheck)
+            };
+
+            return (salesCategoryData, salesSummaryData);
         }
 
 
@@ -50,9 +91,11 @@ namespace AccountingSystem.Services
                 {
                     if (orderItem.Quantity <= item.Available)
                     {
-                        // Зберігаємо ціну товару в orderItem
+                        // Зберігаємо дані товару в orderItem
                         orderItem.Price = item.DiscountedPrice;
                         orderItem.Name = item.Name;
+                        orderItem.Category = item.Category; // Заповнюємо категорію
+                        orderItem.PurchasePrice = item.PurchPrice;
 
                         double itemTotal = Math.Round(orderItem.Quantity * orderItem.Price, 2);
                         totalSum += itemTotal;
@@ -78,7 +121,7 @@ namespace AccountingSystem.Services
                 Sum = Math.Round(totalSum, 2),
                 Date = DateTime.Now,
                 Profit = Math.Round(totalProfit, 2),
-                UserId=model.UserId
+                UserId = model.UserId
             };
 
             checks.InsertOne(check);

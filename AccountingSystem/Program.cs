@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using System.Globalization;
+using PdfSharp.Charting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,8 @@ builder.Services.AddScoped<CheckService>();
 builder.Services.AddScoped<SupplierService>();
 builder.Services.AddScoped<SupplyService>();
 builder.Services.AddScoped<NotificationService>();
+builder.Services.AddControllersWithViews();
+builder.Services.AddSingleton<CheckService>();
 
 
 // Configure Auth0

@@ -19,6 +19,9 @@ namespace AccountingSystem.Models
         public double Quantity { get; set; }
         public double Price { get; set; } // Додано поле для зберігання ціни
         public double TotalPrice => Price * Quantity;
+        public string Category { get; set; } // Додано поле для категорії
+        public double PurchasePrice { get; set; }
     }
+
 
 }

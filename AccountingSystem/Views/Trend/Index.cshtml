@@ -1,1 +1,151 @@
-﻿
+﻿@model IEnumerable<AccountingSystem.Services.SalesCategoryData>
+@{
+    ViewData["Title"] = "Тренди категорій товарів";
+    var salesSummaryData = ViewBag.SalesSummaryData as AccountingSystem.Services.SalesSummaryData;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="get" asp-action="Index" class="form-inline">
+    <div class="form-group mb-2">
+        <label for="startDate" class="mr-2">Start Date:</label>
+        <input type="date" id="startDate" name="startDate" class="form-control" />
+    </div>
+    <div class="form-group mx-sm-3 mb-2">
+        <label for="endDate" class="mr-2">End Date:</label>
+        <input type="date" id="endDate" name="endDate" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary mb-2">Filter</button>
+</form>
+
+
+
+
+<div class="total_container">
+
+
+    <div class="total_item">
+        <p class="total_item_heading">Загалом продано товарів</p>
+        <p class="total_item_count">
+            @salesSummaryData.TotalSalesCount
+        </p>
+    </div>
+
+    <div class="total_item">
+        <p class="total_item_heading">Продано на</p>
+        <p class="total_item_count">
+
+            @salesSummaryData.TotalSalesAmount
+
+        </p>
+    </div>
+
+
+    <div class="total_item">
+        <p class="total_item_heading">Виручка</p>
+        <p class="total_item_count">
+
+
+            @salesSummaryData.TotalProfit
+
+        </p>
+    </div>
+    <div class="total_item">
+        <p class="total_item_heading">Середеній чек</p>
+        <p class="total_item_count">
+
+
+            @salesSummaryData.AverageCheck
+
+        </p>
+    </div>
+
+
+
+</div>
+
+
+
+
+@* <h3>Загальні дані</h3>
+<p>Загальна кількість продажів: @salesSummaryData.TotalSalesCount</p>
+<p>Загальна сума продажів: @salesSummaryData.TotalSalesAmount грн</p>
+<p>Загальний прибуток з продажів: @salesSummaryData.TotalProfit грн</p>
+<p>Середній чек: @salesSummaryData.AverageCheck грн</p>
+ *@
+<div id="chartContainerSales" style="height: 370px; width: 100%; margin-top: 20px;"></div>
+<div id="chartContainerProfit" style="height: 370px; width: 100%; margin-top: 20px;"></div>
+<div id="chartContainerSalesCount" style="height: 370px; width: 100%; margin-top: 20px;"></div>
+
+@section Scripts {
+    <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+    <script type="text/javascript">
+        window.onload = function () {
+            var salesData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+
+            var dataPointsSales = salesData.map(function (data) {
+                return { label: data.Category, y: data.TotalSales };
+            });
+
+            var dataPointsProfit = salesData.map(function (data) {
+                return { label: data.Category, y: data.TotalProfit };
+            });
+
+            var dataPointsSalesCount = salesData.map(function (data) {
+                return { label: data.Category, y: data.SalesCount };
+            });
+
+            var chartSales = new CanvasJS.Chart("chartContainerSales", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Продажі по категоріям"
+                },
+                axisY: {
+                    title: "Продажі"
+                },
+                data: [{
+                    type: "column",
+                    yValueFormatString: "#,##0.## грн",
+                    dataPoints: dataPointsSales
+                }]
+            });
+
+            var chartProfit = new CanvasJS.Chart("chartContainerProfit", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Виручка по категоріям"
+                },
+                axisY: {
+                    title: "Виручка"
+                },
+                data: [{
+                    type: "column",
+                    yValueFormatString: "#,##0.## грн",
+                    dataPoints: dataPointsProfit
+                }]
+            });
+
+            var chartSalesCount = new CanvasJS.Chart("chartContainerSalesCount", {
+                animationEnabled: true,
+                theme: "light2",
+                title: {
+                    text: "Кількість продажів по категоріям"
+                },
+                axisY: {
+                    title: "Кількість продажів"
+                },
+                data: [{
+                    type: "column",
+                    yValueFormatString: "#,##0.##",
+                    dataPoints: dataPointsSalesCount
+                }]
+            });
+
+            chartSales.render();
+            chartProfit.render();
+            chartSalesCount.render();
+        }
+    </script>
+}
