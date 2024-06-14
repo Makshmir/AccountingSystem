@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="BarCode" Version="2024.3.1" />
+    <PackageReference Include="CsvHelper" Version="32.0.3" />
     <PackageReference Include="IronPdf" Version="2024.5.2" />
     <PackageReference Include="IronPdf.Extensions.ASPX" Version="2023.10.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.4" />
@@ -17,6 +18,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Owin" Version="8.0.6" />
     <PackageReference Include="Microsoft.ML" Version="3.0.1" />
     <PackageReference Include="Microsoft.ML.DataView" Version="3.0.1" />
+    <PackageReference Include="Microsoft.ML.FastTree" Version="3.0.1" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.2.2" />
     <PackageReference Include="Microsoft.Owin.Security.OpenIdConnect" Version="4.2.2" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.2" />

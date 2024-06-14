@@ -1,12 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using AccountingSystem.CustomAttributes;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
-using System.ComponentModel.DataAnnotations;
+
 namespace AccountingSystem.Models
 {
     public class Supply
@@ -34,7 +29,4 @@ namespace AccountingSystem.Models
         public double PurchasePrice { get; set; }
         public double TotalPrice => Math.Round(Quantity * PurchasePrice, 2);
     }
-
-
-
 }

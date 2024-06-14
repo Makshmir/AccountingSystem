@@ -5,89 +5,84 @@
 }
 
 <script>
-    function sortTable(n) {
-        var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
-        table = document.getElementById("MyTable");
-        switching = true;
-        dir = "asc";
-
-        while (switching) {
-            switching = false;
-            rows = table.rows;
-            for (i = 1; i < (rows.length - 1); i++) {
-                shouldSwitch = false;
-                x = rows[i].getElementsByTagName("TD")[n];
-                y = rows[i + 1].getElementsByTagName("TD")[n];
-
-                let xContent = x.innerHTML.toLowerCase();
-                let yContent = y.innerHTML.toLowerCase();
-
-                if (dir == "asc") {
-                    if (!isNaN(parseFloat(xContent)) && !isNaN(parseFloat(yContent))) {
-                        if (parseFloat(xContent) > parseFloat(yContent)) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    } else {
-                        if (xContent > yContent) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    }
-                } else if (dir == "desc") {
-                    if (!isNaN(parseFloat(xContent)) && !isNaN(parseFloat(yContent))) {
-                        if (parseFloat(xContent) < parseFloat(yContent)) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    } else {
-                        if (xContent < yContent) {
-                            shouldSwitch = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            if (shouldSwitch) {
-                rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
-                switching = true;
-                switchcount++;
-            } else {
-                if (switchcount == 0 && dir == "asc") {
-                    dir = "desc";
-                    switching = true;
-                }
-            }
-        }
-    }
-
-    function myFunction() {
-        var input, filter, table, tr, td, i, txtValue;
-        input = document.getElementById("myInput");
-        filter = input.value.toUpperCase();
-        table = document.getElementById("MyTable");
-        tr = table.getElementsByTagName("tr");
-
-        for (i = 0; i < tr.length; i++) {
-            td = tr[i].getElementsByTagName("td")[1];
-            if (td) {
-                txtValue = td.textContent || td.innerText;
-                if (txtValue.toUpperCase().indexOf(filter) > -1) {
-                    tr[i].style.display = "";
-                } else {
-                    tr[i].style.display = "none";
-                }
-            }
-        }
-    }
-
     document.addEventListener('DOMContentLoaded', function () {
+        document.getElementById('select-all').onclick = function () {
+            var checkboxes = document.getElementsByName('itemIds');
+            for (var checkbox of checkboxes) {
+                checkbox.checked = this.checked;
+            }
+        };
+
+        document.querySelectorAll('input[name="itemIds"]').forEach(function (checkbox) {
+            checkbox.onclick = function () {
+                if (!this.checked) {
+                    document.getElementById('select-all').checked = false;
+                }
+            };
+        });
+
+        window.sortTable = function (n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("MyTable");
+            switching = true;
+            dir = "asc";
+
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                    let xContent = x.innerHTML.toLowerCase();
+                    let yContent = y.innerHTML.toLowerCase();
+
+                    if (dir == "asc") {
+                        if (!isNaN(parseFloat(xContent)) && !isNaN(parseFloat(yContent))) {
+                            if (parseFloat(xContent) > parseFloat(yContent)) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        } else {
+                            if (xContent > yContent) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    } else if (dir == "desc") {
+                        if (!isNaN(parseFloat(xContent)) && !isNaN(parseFloat(yContent))) {
+                            if (parseFloat(xContent) < parseFloat(yContent)) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        } else {
+                            if (xContent < yContent) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+        };
+
         document.getElementById('categoryFilter').addEventListener('change', function () {
             var selectedCategory = this.value.toLowerCase();
             var table = document.getElementById('MyTable');
             var tr = table.getElementsByTagName('tr');
             for (var i = 1; i < tr.length; i++) {
-                var td = tr[i].getElementsByTagName('td')[8];
+                var td = tr[i].getElementsByTagName('td')[9];
                 if (td) {
                     var category = td.textContent || td.innerText;
                     if (selectedCategory === 'all' || category.toLowerCase().indexOf(selectedCategory) > -1) {
@@ -99,11 +94,10 @@
             }
         });
 
-        // Highlight prices lower than purchase prices
         var rows = document.querySelectorAll('#MyTable tbody tr');
         rows.forEach(function (row) {
-            var purchasePriceCell = row.querySelector('td:nth-child(5)');
-            var priceCell = row.querySelector('td:nth-child(6)');
+            var purchasePriceCell = row.querySelector('td:nth-child(6)');
+            var priceCell = row.querySelector('td:nth-child(9)');
             if (purchasePriceCell && priceCell) {
                 var purchasePrice = parseFloat(purchasePriceCell.textContent);
                 var price = parseFloat(priceCell.textContent);
@@ -113,6 +107,26 @@
             }
         });
     });
+
+    function myFunction() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("myInput");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("MyTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td")[2];
+            if (td) {
+                txtValue = td.textContent || td.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    tr[i].style.display = "";
+                } else {
+                    tr[i].style.display = "none";
+                }
+            }
+        }
+    }
 </script>
 
 <h1>Інвентар</h1>
@@ -130,7 +144,6 @@
 </div>
 <br />
 <div class="button_div">
-
     <form asp-action="GenerateRandomDiscounts" method="post" style="display: inline;">
         <button type="submit" class="plus_item_btn">
             <img src="~/images/discount.png" width="32px" height="32px" /> Згенерувати рандомні знижки
@@ -138,16 +151,11 @@
     </form>
     <form asp-action="RemoveAllDiscounts" method="post" class="d-inline">
         <button type="submit" class="btn btn-danger">
-            
             Видалити всі знижки
-            
         </button>
     </form>
-
 </div>
-
 <br />
-
 <hr />
 <div class="total_container">
     <div class="total_item">
@@ -173,11 +181,11 @@
                 {
                     items_available += Math.Round(item.Available, 2);
                 }
+                items_available = Math.Round(items_available,2);
             }
             @items_available
         </p>
     </div>
-
     <div class="total_item">
         <p class="total_item_heading">Сума продуктів</p>
         <p class="total_item_count">
@@ -192,7 +200,6 @@
             @items_purch_price
         </p>
     </div>
-
     <div class="total_item">
         <p class="total_item_heading">Можлива виручка</p>
         <p class="total_item_count">
@@ -208,10 +215,7 @@
         </p>
     </div>
 </div>
-
 <br />
-
-
 <div class="search-menu">
     <input type="text" id="myInput" onkeyup="myFunction()" class="search-input" onchange="myFunction()" placeholder="Пошук">
     <br />
@@ -223,68 +227,70 @@
         }
     </select>
 </div>
-
-
-<table class="table" id="MyTable">
-    <thead>
-        <tr>
-            <th>@Html.DisplayNameFor(model => model.ImageUrl)</th>
-            <th onclick="sortTable(1)">@Html.DisplayNameFor(model => model.Name)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-            <th onclick="sortTable(2)">@Html.DisplayNameFor(model => model.Barcode)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-            <th onclick="sortTable(3)">@Html.DisplayNameFor(model => model.Available)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-            <th onclick="sortTable(4)">Закупівля<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-            <th onclick="sortTable(5)">@Html.DisplayNameFor(model => model.Price)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-            <th onclick="sortTable(6)">%<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-            <th onclick="sortTable(7)">Після знижки<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-
-
-            <th style="display: none;">@Html.DisplayNameFor(model => model.Category)</th>
-            <th></th>
-        </tr>
-
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
+<form method="post" asp-action="GeneratePdf">
+    <table class="table" id="MyTable">
+        <thead>
             <tr>
-                <td>
-                    @if (item.ImageUrl != null)
-                    {
-                        <img height="64px" width="64px" src="@Url.Content(item.ImageUrl)" alt="Image" />
-                    }
-                </td>
-                <td class="item-name">
-                    @Html.ActionLink(Html.DisplayTextFor(modelItem => item.Name).ToString(), "Edit", new { id = item.Id })
-                    <br />
-                    <a href="@Url.Action("Details", "items", new { id = item.Id })" class="links">
-                        <img src="@Url.Content("~/images/print.png")" width="32px" height="32px" alt="Details">
-                    </a>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Barcode)
-                    @{
-                        IronBarCode.GeneratedBarcode myBarcode = IronBarCode.BarcodeWriter.CreateBarcode(item.Barcode, IronBarCode.BarcodeEncoding.Code128);
-                        myBarcode.ResizeTo(50, 50);
-                        myBarcode.SetMargins(5, 5, 5, 5);
-                        string DataURL = myBarcode.ToDataUrl();
-                    }
-                    <br />
-                    <img src="@DataURL" />
-                </td>
-                <td>@Html.DisplayFor(modelItem => item.Available) @Html.DisplayFor(modelItem => item.Unit)</td>
-                <td>@Html.DisplayFor(modelItem => item.PurchPrice)</td>
-                <td class="item-price"><s>@Html.DisplayFor(modelItem => item.Price) </s> </td>
-                <td class="item-price">@Html.DisplayFor(modelItem => item.Discount)  </td>
-                <td>@Html.DisplayFor(modelItem => item.DiscountedPrice)</td>
-                <td style="display: none;">@Html.DisplayFor(modelItem => item.Category)</td>
-
-                <td>
-                    <a href="@Url.Action("Delete", "items", new { id = item.Id })" class="links">
-                        <img src="@Url.Content("~/images/close.png")" width="32px" height="32px" alt="Details">
-                    </a>
-                </td>
-
+                <th class="custom-checkbox">
+                    <input type="checkbox" id="select-all" />
+                    <label for="select-all"></label>
+                </th>
+                <th>@Html.DisplayNameFor(model => model.ImageUrl)</th>
+                <th onclick="sortTable(2)">@Html.DisplayNameFor(model => model.Name)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+                <th onclick="sortTable(3)">Штрих-код<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+                <th onclick="sortTable(4)">@Html.DisplayNameFor(model => model.Available)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+                <th onclick="sortTable(5)">Закупівля<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+                <th onclick="sortTable(6)">Продаж<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+                <th onclick="sortTable(7)">%<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+                <th onclick="sortTable(8)">Після знижки<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+                <th style="display: none;">@Html.DisplayNameFor(model => model.Category)</th>
+                <th></th>
             </tr>
-        }
-    </tbody>
-</table>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td class="custom-checkbox">
+                        <input type="checkbox" id="item-@item.Id" name="itemIds" value="@item.Id" />
+                        <label for="item-@item.Id"></label>
+                    </td>
+                    <td>
+                        @if (item.ImageUrl != null)
+                        {
+                            <img height="64px" width="64px" src="@Url.Content(item.ImageUrl)" alt="Image" />
+                        }
+                    </td>
+                    <td class="item-name">
+                        @Html.ActionLink(Html.DisplayTextFor(modelItem => item.Name).ToString(), "Edit", new { id = item.Id })
+                        <br />
+
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Barcode)
+                        @{
+                            IronBarCode.GeneratedBarcode myBarcode = IronBarCode.BarcodeWriter.CreateBarcode(item.Barcode, IronBarCode.BarcodeEncoding.Code128);
+                            myBarcode.ResizeTo(50, 50);
+                            myBarcode.SetMargins(5, 5, 5, 5);
+                            string DataURL = myBarcode.ToDataUrl();
+                        }
+                        <br />
+                        <img src="@DataURL" />
+                    </td>
+                    <td>@Html.DisplayFor(modelItem => item.Available) @Html.DisplayFor(modelItem => item.Unit)</td>
+                    <td>@Html.DisplayFor(modelItem => item.PurchPrice)</td>
+                    <td class="item-price"><s>@Html.DisplayFor(modelItem => item.Price) </s> </td>
+                    <td class="item-price">@Html.DisplayFor(modelItem => item.Discount)  </td>
+                    <td>@Html.DisplayFor(modelItem => item.DiscountedPrice)</td>
+                    <td style="display: none;">@Html.DisplayFor(modelItem => item.Category)</td>
+                    <td>
+                        <a href="@Url.Action("Delete", "items", new { id = item.Id })" class="links">
+                            <img src="@Url.Content("~/images/close.png")" width="32px" height="32px" alt="Details">
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Друк цінників</button>
+</form>

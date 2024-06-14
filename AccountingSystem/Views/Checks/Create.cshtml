@@ -5,8 +5,7 @@
 }
 
 <script type="text/javascript">
-    var itemIndex = 1; // Початковий індекс для доданих товарів
-
+    var itemIndex = 1;
     var items = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.Items));
 
     function updateFieldsById(itemId, nameSelect, barcodeSelect) {
@@ -29,16 +28,18 @@
         document.querySelectorAll('.select_item_to_sell').forEach(function (select) {
             select.addEventListener('change', function () {
                 var itemId = this.value;
-                var barcodeSelect = this.parentElement.querySelector('.select_item_to_sell_barcode');
+                var barcodeSelect = this.closest('.element_to_check').querySelector('.select_item_to_sell_barcode');
                 updateFieldsById(itemId, this, barcodeSelect);
+                updateTotal();
             });
         });
 
         document.querySelectorAll('.select_item_to_sell_barcode').forEach(function (select) {
             select.addEventListener('change', function () {
                 var itemBarcode = this.value;
-                var nameSelect = this.parentElement.querySelector('.select_item_to_sell');
+                var nameSelect = this.closest('.element_to_check').querySelector('.select_item_to_sell');
                 updateFieldsByBarcode(itemBarcode, nameSelect, this);
+                updateTotal();
             });
         });
     });
@@ -49,7 +50,6 @@
         if (lastSelect && lastSelect.value.trim() === '') {
             return;
         }
-
         var txtNewInputBox = document.createElement('div');
         txtNewInputBox.className = "element_to_check";
         txtNewInputBox.id = `element${itemIndex}`;
@@ -78,14 +78,14 @@
         document.getElementById("inputFields").appendChild(txtNewInputBox);
         itemIndex++;
         updateIndexes();
-        addEventListeners(txtNewInputBox); // Додаємо обробники подій для нових елементів
+        addEventListeners(txtNewInputBox);
     }
 
     function updateMax(select) {
         var selectedOption = select.options[select.selectedIndex];
         if (selectedOption) {
             var availableQuantity = parseInt(selectedOption.getAttribute('data-available'));
-            var quantityInput = select.nextElementSibling;
+            var quantityInput = select.closest('.element_to_check').querySelector('.item_quantity_input');
             if (quantityInput) {
                 quantityInput.max = availableQuantity;
             }
@@ -96,13 +96,12 @@
         var element = document.getElementById(elementId);
         if (element) {
             element.remove();
-            updateIndexes(); // Оновити індекси після видалення елемента
+            updateIndexes();
         } else {
             console.error('Елемент з ID', elementId, 'не знайдено.');
         }
-        updateTotal(); // Оновити загальну суму після видалення елемента
+        updateTotal();
     }
-
 
     function updateIndexes() {
         var elements = document.querySelectorAll('.element_to_check');
@@ -118,22 +117,24 @@
 
     function updateTotal() {
         var total = 0;
-        var items = document.querySelectorAll('.select_item_to_sell');
+        var items = document.querySelectorAll('.element_to_check');
         var isValid = true;
 
         items.forEach(function (item) {
-            var selectedOption = item.options[item.selectedIndex];
+            var nameSelect = item.querySelector('.select_item_to_sell');
+            var barcodeSelect = item.querySelector('.select_item_to_sell_barcode');
+            var quantityInput = item.querySelector('.item_quantity_input');
+
+            var selectedOption = nameSelect.options[nameSelect.selectedIndex];
             if (selectedOption) {
                 var price = parseFloat(selectedOption.getAttribute('data-price'));
-                var quantityInput = item.nextElementSibling.nextElementSibling;
-                if (quantityInput) {
-                    var quantity = parseFloat(quantityInput.value);
-                    if (!isNaN(price) && !isNaN(quantity)) {
-                        total += price * quantity;
-                    }
+                var quantity = parseFloat(quantityInput.value);
+                if (!isNaN(price) && !isNaN(quantity)) {
+                    total += price * quantity;
                 }
             }
-            if (item.value === '' || item.nextElementSibling.value === '') {
+
+            if (nameSelect.value === '' || barcodeSelect.value === '') {
                 isValid = false;
             }
         });
@@ -177,7 +178,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.element_to_check').forEach(addEventListeners);
-        updateTotal(); // Ініціалізація валідації під час завантаження сторінки
+        updateTotal();
     });
 </script>
 
@@ -211,7 +212,7 @@
                         }
                     </select>
 
-                    <input type="number" name="Items[0].Quantity" class="item_quantity_input form-control" step="0.1" min="0.1" value="0" oninput="updateTotal();" />
+                    <input type="number" name="Items[0].Quantity" class="item_quantity_input form-control" step="0.01" min="0.01" value="0" oninput="updateTotal();" />
                     <button type="button" class="delete_btn btn btn-danger" onclick="deleteElement('element0'); updateTotal();">Видалити</button>
                 </div>
             </div>

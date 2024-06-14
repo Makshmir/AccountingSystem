@@ -1,9 +1,7 @@
 ﻿@model IEnumerable<AccountingSystem.Models.Notification>
-
 @{
     ViewData["Title"] = "Notifications";
 }
-
 <h1>Сповіщення</h1>
 
 <table class="table">
@@ -19,16 +17,10 @@
         @foreach (var notification in Model)
         {
             <tr>
-
                 <td>
-                    @* <a asp-action="Edit" asp-route-id="@notification.Id" class="btn btn-primary">Змінити</a> *@
-
                     <a asp-action="Edit" asp-route-id="@notification.Id">
                         @notification.EventName
-                    </a>
-
-                    @* @notification.EventName *@
-                    
+                    </a> 
                 </td>
                 <td>@notification.EventDate.ToString("d")</td>
                 <td>@string.Join(", ", notification.Categories)</td>
@@ -36,13 +28,9 @@
                     <a href="@Url.Action("Delete", "Notification", new { id = @notification.Id })" class="links">
                         <img src="@Url.Content("~/images/close.png")" width="32px" height="32px" alt="Details">
                     </a>
-
-
-                    @* <a asp-action="Delete" asp-route-id="@notification.Id" class="btn btn-danger">Видалити</a> *@
                 </td>
             </tr>
         }
     </tbody>
 </table>
-
 <a asp-action="Create" class="btn btn-success">Створити нове сповіщення</a>

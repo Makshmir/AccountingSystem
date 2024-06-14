@@ -1,5 +1,4 @@
 ﻿@model AccountingSystem.Models.Notification
-
 @{
     ViewData["Title"] = "Edit Notification";
 }
@@ -33,7 +32,7 @@
             </div>
 
             <div id="categoryContainer" class="form-group">
-                <label class="control-label">Categories</label>
+                <label class="control-label">Категорії</label>
                 @for (int i = 0; i < Model.Categories.Count; i++)
                 {
                     <div class="input-group mb-3">

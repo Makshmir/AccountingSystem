@@ -24,13 +24,14 @@ body {
     display:flex;
     flex-direction:row;
     flex:1 1;
+    flex-wrap:wrap;
 }
 .total_item {
     flex-basis: 0;
     flex-grow: 1;
     flex-shrink: 1;
     padding: .75rem;
-    margin: 0px 30px 0px 30px;
+    margin: 10px 30px 5px 30px;
     border-radius: 16px;
     box-shadow: 2px 2px 20px -1px rgba(153,144,153,1);
 }
@@ -561,3 +562,355 @@ a.btn-back {
 .flex-nav-bar {
     flex-grow: 3;
 }
+
+.trend-category-list {
+    list-style-type: none;
+    padding: 0;
+}
+
+.trend-category-item {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    margin: 10px 0;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+    .trend-category-item p {
+        margin: 0;
+        font-size: 1.2em;
+        font-weight: bold;
+    }
+
+.trend-category-score {
+    background-color: #007bff;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+.page-title {
+    font-size: 2em;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.confirmation-text {
+    font-size: 1.2em;
+    margin-bottom: 30px;
+    color: #666;
+    text-align: center;
+}
+
+.delete-container {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.delete-details dt {
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.delete-details dd {
+    margin-bottom: 10px;
+}
+
+.delete-image {
+    max-width: 100%;
+    height: auto;
+    border: 1px solid #ddd;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.delete-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+.return-button {
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
+
+.price-title {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: center;
+}
+.price-details {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+.price-element {
+    margin-bottom: 5px;
+}
+.price-label {
+    font-weight: bold;
+    color: #555;
+    font-size: 0.8em;
+}
+.price-name {
+    font-size: 1.2em;
+    color: #333;
+}
+.original-price {
+    font-size: 0.8em;
+    color: #999;
+    text-decoration: line-through;
+    margin-right: 5px;
+}
+.discounted-price {
+    font-size: 1.2em;
+    color: #e74c3c;
+}
+.barcode-image {
+    margin-top: 10px;
+    display: block;
+    max-width: 100%;
+    height: auto;
+}
+.price-tag {
+    width: 48%;
+    page-break-inside: avoid;
+    border: 1px solid #ddd;
+    padding: 10px;
+    box-sizing: border-box;
+    margin-bottom: 10px;
+}
+
+/* Стиль для приховання стандартного чекбокса */
+/* Стиль для приховання стандартного чекбокса */
+.custom-checkbox input[type="checkbox"] {
+    display: none;
+}
+
+/* Стиль для замінника чекбокса */
+.custom-checkbox label {
+    display: inline-block;
+    position: relative;
+    padding-left: 35px;
+    margin-right: 10px;
+    cursor: pointer;
+    font-size: 22px;
+    user-select: none;
+    color: #333;
+    line-height: 25px; /* Вирівнювання по вертикалі */
+}
+
+    /* Стиль для замінника чекбокса - квадратик */
+    .custom-checkbox label::before {
+        content: "";
+        display: inline-block;
+        position: absolute;
+        left: 0;
+        top: -19px;
+        width: 25px;
+        height: 25px;
+        border: 2px solid #999;
+        border-radius: 3px;
+        background-color: #fff;
+    }
+
+/* Стиль для замінника чекбокса при активному чекбоксі */
+.custom-checkbox input[type="checkbox"]:checked + label::before {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+}
+
+/* Стиль для галочки */
+.custom-checkbox label::after {
+    content: "";
+    display: none;
+    position: absolute;
+    left: 7px;
+    top: 3px;
+    width: 10px;
+    height: 15px;
+    border: solid white;
+    border-width: 0 3px 3px 0;
+    transform: rotate(45deg);
+}
+
+/* Відображення галочки при активному чекбоксі */
+.custom-checkbox input[type="checkbox"]:checked + label::after {
+    display: block;
+}
+/* Загальні стилі для сторінки видалення */
+.delete-container {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h3 {
+    text-align: center;
+}
+
+.details-list {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 10px 20px;
+}
+
+.details-label {
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    color: #555;
+}
+
+.details-value {
+    text-align: left;
+    color: #333;
+}
+
+.delete-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }
+
+/* Загальні стилі для сторінки видалення */
+.delete-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1, h3 {
+    text-align: center;
+}
+
+.details-list {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 10px 20px;
+}
+
+.details-label {
+    font-weight: bold;
+    text-align: right;
+    padding-right: 10px;
+    color: #555;
+}
+
+.details-value {
+    text-align: left;
+    color: #333;
+}
+
+.table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+    .table th, .table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+    }
+
+    .table th {
+        background-color: #f2f2f2;
+        font-weight: bold;
+    }
+
+    .table tr:nth-child(even) {
+        background-color: #f9f9f9;
+    }
+
+    .table tr:hover {
+        background-color: #f1f1f1;
+    }
+
+.delete-form {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.btn {
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-align: center;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-danger {
+    background-color: #dc3545;
+    color: white;
+    border: none;
+}
+
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: none;
+}
+
+    .btn-secondary:hover {
+        background-color: #5a6268;
+    }

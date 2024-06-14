@@ -1,16 +1,12 @@
-﻿using System.Linq;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using AccountingSystem.Models;
-using System;
+
 
 namespace AccountingSystem.Services
 {
     public class ItemService
     {
         private readonly IMongoCollection<Item> items;
-
         public ItemService(IConfiguration config)
         {
             MongoClient client = new MongoClient(config.GetConnectionString("AccountingDb"));
@@ -23,6 +19,15 @@ namespace AccountingSystem.Services
             return items.Find(item => item.UserId == userId).ToList();
         }
 
+        public List<Item> GetItemsByIds(string[] ids, string userId)
+        {
+            var filter = Builders<Item>.Filter.And(
+                Builders<Item>.Filter.In(i => i.Id, ids),
+                Builders<Item>.Filter.Eq(i => i.UserId, userId)
+            );
+
+            return items.Find(filter).ToList();
+        }
         public Item Get(string id, string userId)
         {
             return items.Find(item => item.Id == id && item.UserId == userId).FirstOrDefault();

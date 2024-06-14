@@ -70,7 +70,6 @@ namespace AccountingSystem.Controllers
             return View(checkDetails);
         }
 
-
         public ActionResult Delete(string id)
         {
             if (id == null)

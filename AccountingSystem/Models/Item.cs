@@ -1,5 +1,4 @@
-﻿using AccountingSystem.CustomAttributes;
-using MongoDB.Bson;
+﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
 namespace AccountingSystem.Models
@@ -30,7 +29,6 @@ namespace AccountingSystem.Models
         [BsonElement("Available")]
         [Required]
         [Display(Name = "Доступно")]
-        [AvailableRange]
         public double Available { get; set; }
 
         [BsonElement("Price")]
@@ -42,7 +40,6 @@ namespace AccountingSystem.Models
         [Display(Name = "Собівартість(грн)")]
         [Required]
         public double PurchPrice { get; set; }
-
 
         [BsonElement("MarkupPriceInterest")]
         public double MarkupPriceInterest { get; set; }
@@ -64,8 +61,6 @@ namespace AccountingSystem.Models
         [Required]
         public string SupplierId { get; set; }
 
-
-        // New attributes
         public double Discount { get; set; }
         public double DiscountedPrice { get; set; }
     }

@@ -1,6 +1,4 @@
 ﻿@model IEnumerable<AccountingSystem.Models.Check>
-
-
 @{
     ViewData["Title"] = "Продажі";
 }
@@ -61,9 +59,7 @@
             }
         }
     }
-
 </script>
-
 
 <h1>Продажі</h1>
 <a asp-action="Create">
@@ -72,16 +68,8 @@
     </button>
 </a>
 <br />
-
-
-
-
-
-
 <hr />
 <div class="total_container">
-
-
     <div class="total_item">
         <p class="total_item_heading">Загалом продажів</p>
         <p class="total_item_count">
@@ -113,12 +101,9 @@
         </p>
     </div>
 
-
     <div class="total_item">
         <p class="total_item_heading">Виручка</p>
         <p class="total_item_count">
-
-
             @{
             double total_profit = 0;
             foreach (var item in Model)
@@ -127,24 +112,18 @@
             }
             }
             @total_profit
-
         </p>
     </div>
-
-
-
 </div>
-
 <br />
-
 
 <table class="table" id="MyTable">
     <thead>
         <tr>
             <th>@Html.DisplayNameFor(model => model.Id)</th>
-            <th onclick="sortTable(1)">@Html.DisplayNameFor(model => model.Date)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-            <th onclick="sortTable(2)">@Html.DisplayNameFor(model => model.Sum)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
-            <th onclick="sortTable(3)">@Html.DisplayNameFor(model => model.Profit)<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+            <th onclick="sortTable(1)">Дата<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+            <th onclick="sortTable(2)">Сума<img src="~/images/sorting.png" height="16px" width="16px" /></th>
+            <th onclick="sortTable(3)">Виручка<img src="~/images/sorting.png" height="16px" width="16px" /></th>
             <th></th>
         </tr>
     </thead>
@@ -154,7 +133,6 @@
             <tr>
                 <td>
                     @Html.ActionLink(Html.DisplayTextFor(modelItem => item.Id).ToString(), "Details", new { id = item.Id })
-
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.Date)                     
@@ -162,14 +140,9 @@
                 <td>@Html.DisplayFor(modelItem => item.Sum)</td>
                 <td>@Html.DisplayFor(modelItem => item.Profit)</td>
                 <td>
-
                     <a href="@Url.Action("Delete", "Checks", new { id = item.Id })" class="links">
                         <img src="@Url.Content("~/images/close.png")" width="32px" height="32px" alt="Delete">
                     </a>
-
-
-
-
                 </td>
             </tr>
         }

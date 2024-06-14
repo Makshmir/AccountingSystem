@@ -3,9 +3,7 @@ using AccountingSystem.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
-using System.Collections.Generic;
 using System.Dynamic;
-using System.Linq;
 using System.Security.Claims;
 using Newtonsoft.Json;
 
@@ -140,7 +138,6 @@ namespace AccountingSystem.Controllers
                 }
 
                 return RedirectToAction(nameof(Index));
-           
         }
 
         public IActionResult Delete(string id)
@@ -164,17 +161,13 @@ namespace AccountingSystem.Controllers
             {
                 return NotFound();
             }
-
-            // Revert item quantities
             foreach (var item in supply.Items)
             {
                 _itemService.UpdateQuantity(item.ItemId, -item.Quantity, userId);
             }
-
             _supplyService.Remove(id, userId);
             return RedirectToAction(nameof(Index));
         }
-
 
         public IActionResult Details(string id)
         {

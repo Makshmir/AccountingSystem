@@ -2,10 +2,11 @@
 @{
     ViewData["Title"] = "Тренди категорій товарів";
     var salesSummaryData = ViewBag.SalesSummaryData as AccountingSystem.Services.SalesSummaryData;
+    var trendCategoryScores = ViewBag.TrendCategoryScores;
 }
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 
 <h2>@ViewData["Title"]</h2>
-
 <form method="get" asp-action="Index" class="form-inline">
     <div class="form-group mb-2">
         <label for="startDate" class="mr-2">Start Date:</label>
@@ -13,17 +14,22 @@
     </div>
     <div class="form-group mx-sm-3 mb-2">
         <label for="endDate" class="mr-2">End Date:</label>
-        <input type="date" id="endDate" name="endDate" class="form-control" />
+        <input class="form-control" type="date" id="endDate" name="endDate"  />
+
     </div>
-    <button type="submit" class="btn btn-primary mb-2">Filter</button>
+    <button type="submit" class="btn btn-primary mb-2">Фільтрувати</button>
 </form>
 
+<h3>Загальні дані</h3>
 
-
+@{
+    @if (salesSummaryData.TotalSalesCount == 0)
+    {
+        <h3>Замало даних для аналізу</h3>
+    }
+}
 
 <div class="total_container">
-
-
     <div class="total_item">
         <p class="total_item_heading">Загалом продано товарів</p>
         <p class="total_item_count">
@@ -33,46 +39,39 @@
 
     <div class="total_item">
         <p class="total_item_heading">Продано на</p>
-        <p class="total_item_count">
-
+        <p class="total_item_count"
             @salesSummaryData.TotalSalesAmount
-
         </p>
     </div>
-
 
     <div class="total_item">
         <p class="total_item_heading">Виручка</p>
         <p class="total_item_count">
-
-
             @salesSummaryData.TotalProfit
-
         </p>
     </div>
+
     <div class="total_item">
-        <p class="total_item_heading">Середеній чек</p>
+        <p class="total_item_heading">Середній чек</p>
         <p class="total_item_count">
-
-
             @salesSummaryData.AverageCheck
-
         </p>
     </div>
-
-
-
 </div>
 
+<div class="container mt-5">
+    <h3>Трендові категорії</h3>
+    <ul class="trend-category-list">
+        @foreach (var trend in trendCategoryScores)
+        {
+            <li class="trend-category-item">
+                <p>@trend.Category</p>
+                <span class="trend-category-score">@Math.Round(trend.Score, 2)</span>
+            </li>
+        }
+    </ul>
+</div>
 
-
-
-@* <h3>Загальні дані</h3>
-<p>Загальна кількість продажів: @salesSummaryData.TotalSalesCount</p>
-<p>Загальна сума продажів: @salesSummaryData.TotalSalesAmount грн</p>
-<p>Загальний прибуток з продажів: @salesSummaryData.TotalProfit грн</p>
-<p>Середній чек: @salesSummaryData.AverageCheck грн</p>
- *@
 <div id="chartContainerSales" style="height: 370px; width: 100%; margin-top: 20px;"></div>
 <div id="chartContainerProfit" style="height: 370px; width: 100%; margin-top: 20px;"></div>
 <div id="chartContainerSalesCount" style="height: 370px; width: 100%; margin-top: 20px;"></div>
@@ -81,7 +80,20 @@
     <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
     <script type="text/javascript">
         window.onload = function () {
+            let date = new Date(),
+                day = date.getDate() + 1,
+                month = date.getMonth() + 1,
+                year = date.getFullYear();
+
+            if (month < 10) month = "0" + month;
+            if (day < 10) day = "0" + day;
+
+            const todayDate = `${year}-${month}-${day}`;
+            document.getElementById("endDate").defaultValue = todayDate;
+
             var salesData = @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model));
+
+            console.log("Incoming Sales Data:", salesData);
 
             var dataPointsSales = salesData.map(function (data) {
                 return { label: data.Category, y: data.TotalSales };
@@ -138,7 +150,7 @@
                 },
                 data: [{
                     type: "column",
-                    yValueFormatString: "#,##0.##",
+                    yValueFormatString: "#,##0",
                     dataPoints: dataPointsSalesCount
                 }]
             });

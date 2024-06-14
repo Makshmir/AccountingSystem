@@ -1,20 +1,12 @@
 ﻿using MongoDB.Driver;
 using AccountingSystem.Models;
-using System.Collections.Generic;
-using System;
-using Microsoft.Extensions.Configuration;
 
 namespace AccountingSystem.Services
 {
     public class CheckService
     {
-        
-
-
-
         private readonly IMongoCollection<Check> checks;
         private readonly IMongoCollection<Item> items;
-
         public CheckService(IConfiguration config)
         {
             MongoClient client = new MongoClient(config.GetConnectionString("AccountingDb"));
@@ -23,6 +15,39 @@ namespace AccountingSystem.Services
             items = database.GetCollection<Item>("items");
         }
 
+        public List<SalesData> GetSalesByCategoryDaily(string userId, DateTime? startDate, DateTime? endDate)
+        {
+            var filterBuilder = Builders<Check>.Filter;
+            var filter = filterBuilder.Eq(c => c.UserId, userId);
+
+            if (startDate.HasValue)
+            {
+                filter &= filterBuilder.Gte(c => c.Date, startDate.Value);
+            }
+            if (endDate.HasValue)
+            {
+                filter &= filterBuilder.Lte(c => c.Date, endDate.Value);
+            }
+
+            var checks = this.checks.Find(filter).ToList();
+
+            var groupedData = checks.SelectMany(c => c.Items.Select(i => new
+            {
+                c.Date,
+                Category = i.Category,
+                i.Quantity
+
+            }))
+            .GroupBy(x => new { x.Date.Date, x.Category })
+            .Select(g => new SalesData
+            {
+                Category = g.Key.Category,
+                TotalSales=Convert.ToInt32(g.Sum(i => i.Quantity))
+            })
+            .ToList();
+
+            return groupedData;
+        }
         public (List<SalesCategoryData> salesCategoryData, SalesSummaryData salesSummaryData) GetSalesSummaryByCategory(string userId, DateTime? startDate, DateTime? endDate)
         {
             var query = checks.Find(c => c.UserId == userId).ToEnumerable();
@@ -43,7 +68,7 @@ namespace AccountingSystem.Services
                                          .Select(g => new SalesCategoryData
                                          {
                                              Category = g.Key,
-                                             TotalSales = Math.Round(g.Sum(i => i.TotalPrice)),
+                                             TotalSales = Convert.ToSingle(Math.Round(g.Sum(i => i.TotalPrice))),
                                              TotalProfit = Math.Round(g.Sum(i => i.Quantity * (i.Price - i.PurchasePrice))),
                                              SalesCount = g.Sum(i => (int)i.Quantity)
                                          })
@@ -64,9 +89,6 @@ namespace AccountingSystem.Services
 
             return (salesCategoryData, salesSummaryData);
         }
-
-
-
 
         public List<Check> GetByUserId(string userId)
         {
@@ -91,10 +113,9 @@ namespace AccountingSystem.Services
                 {
                     if (orderItem.Quantity <= item.Available)
                     {
-                        // Зберігаємо дані товару в orderItem
                         orderItem.Price = item.DiscountedPrice;
                         orderItem.Name = item.Name;
-                        orderItem.Category = item.Category; // Заповнюємо категорію
+                        orderItem.Category = item.Category;
                         orderItem.PurchasePrice = item.PurchPrice;
 
                         double itemTotal = Math.Round(orderItem.Quantity * orderItem.Price, 2);
@@ -104,6 +125,7 @@ namespace AccountingSystem.Services
                         totalProfit += itemTotalProfit;
 
                         item.Available -= Math.Round(orderItem.Quantity, 2);
+                        item.Available = Math.Round(item.Available, 2);
                         var filter = Builders<Item>.Filter.Eq("Id", item.Id);
                         var update = Builders<Item>.Update.Set("Available", item.Available);
                         items.UpdateOne(filter, update);
@@ -127,7 +149,6 @@ namespace AccountingSystem.Services
             checks.InsertOne(check);
             return check;
         }
-
 
         public CheckDetailsViewModel GetCheckDetails(string id, string userId)
         {
@@ -156,8 +177,6 @@ namespace AccountingSystem.Services
             };
         }
 
-
-
         public void Delete(string id, string userId)
         {
             checks.DeleteOne(check => check.Id == id && check.UserId == userId);
@@ -171,6 +190,7 @@ namespace AccountingSystem.Services
                 if (item != null)
                 {
                     item.Available += orderItem.Quantity;
+                    item.Available = Math.Round(item.Available, 2);
                     var filter = Builders<Item>.Filter.Eq("Id", item.Id);
                     var update = Builders<Item>.Update.Set("Available", item.Available);
                     items.UpdateOne(filter, update);

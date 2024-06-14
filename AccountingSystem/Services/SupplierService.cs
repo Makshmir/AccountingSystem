@@ -1,14 +1,11 @@
 ﻿using MongoDB.Driver;
 using AccountingSystem.Models;
-using System.Collections.Generic;
-using Microsoft.Extensions.Configuration;
 
 namespace AccountingSystem.Services
 {
     public class SupplierService
     {
         private readonly IMongoCollection<Supplier> suppliers;
-
         public SupplierService(IConfiguration config)
         {
             MongoClient client = new MongoClient(config.GetConnectionString("AccountingDb"));

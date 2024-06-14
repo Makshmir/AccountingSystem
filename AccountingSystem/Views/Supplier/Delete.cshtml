@@ -1,39 +1,36 @@
 ﻿@model AccountingSystem.Models.Supplier
-
 @{
     ViewData["Title"] = "Delete";
 }
 
-<h1>Delete</h1>
+<h1>Видалити постачальника</h1>
 
-<h3>Are you sure you want to delete this?</h3>
-<div>
-
+<h3>Ви впевнені, що хочете видалити цього постачальника?</h3>
+<div class="delete-container">
     <hr />
-    <dl class="details_div">
-        <dt class="check-details-label">
-            @Html.DisplayNameFor(model => model.Name)
+    <dl class="details-list">
+        <dt class="details-label">
+            Назва
         </dt>
-        <dd class="check-details-value">
+        <dd class="details-value">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class="check-details-label">
-            @Html.DisplayNameFor(model => model.Address)
+        <dt class="details-label">
+            Адреса
         </dt>
-        <dd class="check-details-value">
+        <dd class="details-value">
             @Html.DisplayFor(model => model.Address)
         </dd>
-        <dt class="check-details-label">
-            @Html.DisplayNameFor(model => model.ContactNumber)
+        <dt class="details-label">
+            Номер телефону
         </dt>
-        <dd class="check-details-value">
+        <dd class="details-value">
             @Html.DisplayFor(model => model.ContactNumber)
         </dd>
-
     </dl>
 
-    <form asp-action="Delete">
-        <input type="submit" value="Delete" class="btn btn-danger" /> |
-        <a asp-action="Index">Повернутись</a>
+    <form asp-action="Delete" class="delete-form">
+        <input type="submit" value="Видалити" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Повернутись</a>
     </form>
 </div>

@@ -4,7 +4,6 @@
 }
 
 <h1>Створення товару</h1>
-
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -60,8 +59,28 @@
                 </div>
             </div>
 
+            <div class="input_group">
+                <div class="form-group">
+                    <label>Знижка (%)</label>
+                    <input  type="number" class="form-control" id="discount" name="Items.Discount" />
+                </div>
 
+                <div class="form-group">
+                    <label>Ціна після знижки</label>
+                    <input type="number" class="form-control" readonly id="discountedPrice" name="Items.DiscountedPrice" />
+                </div>
+            </div>
+            <div class="input_group">
+                <div class="form-group">
+                    <label> Націнка</label>
+                    <input readonly type="number" class="form-control" id="markupPriceNumeric" name="Items.MarkupPriceNumeric" />
+                </div>
 
+                <div class="form-group">
+                    <label>Націнка %</label>
+                    <input readonly type="number" class="form-control" id="markupPriceInterest" name="Items.MarkupPriceInterest" />
+                </div>
+            </div>
 
             <div class="form-group">
                 <label> Постачальник</label>
@@ -81,7 +100,7 @@
             </div>
 
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Створити" class="btn btn-primary" />
             </div>
         </form>
     </div>
@@ -92,5 +111,51 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script type="text/javascript">
+        document.addEventListener('DOMContentLoaded', function () {
+            var priceInput = document.querySelector('input[name="Items.Price"]');
+            var discountInput = document.querySelector('input[name="Items.Discount"]');
+            var discountedPriceInput = document.querySelector('input[name="Items.DiscountedPrice"]');
+            var purchPriceInput = document.querySelector('input[name="Items.PurchPrice"]');
+            var markupPriceNumericInput = document.querySelector('input[name="Items.MarkupPriceNumeric"]');
+            var markupPriceInterestInput = document.querySelector('input[name="Items.MarkupPriceInterest"]');
+
+            function updateDiscountedPrice() {
+                var price = parseFloat(priceInput.value);
+                var discount = parseFloat(discountInput.value);
+                if (!isNaN(price) && !isNaN(discount)) {
+                    var discountedPrice = price - (price * (discount / 100));
+                    discountedPriceInput.value = discountedPrice.toFixed(2);
+                    updateMarkup(discountedPrice);
+                } else {
+                    discountedPriceInput.value = '';
+                }
+            }
+
+            function updateMarkup(discountedPrice) {
+                var purchPrice = parseFloat(purchPriceInput.value);
+                if (!isNaN(discountedPrice) && !isNaN(purchPrice)) {
+                    var markup = discountedPrice - purchPrice;
+                    var markupPercent = (purchPrice !== 0) ? ((markup / purchPrice) * 100) : 0;
+
+                    markupPriceNumericInput.value = markup.toFixed(2);
+                    markupPriceInterestInput.value = markupPercent.toFixed(2);
+                } else {
+                    markupPriceNumericInput.value = '';
+                    markupPriceInterestInput.value = '';
+                }
+            }
+
+            priceInput.addEventListener('input', updateDiscountedPrice);
+            discountInput.addEventListener('input', updateDiscountedPrice);
+            purchPriceInput.addEventListener('input', function () {
+                var discountedPrice = parseFloat(discountedPriceInput.value);
+                if (!isNaN(discountedPrice)) {
+                    updateMarkup(discountedPrice);
+                }
+            });
+
+            updateDiscountedPrice();
+        });
+    </script>
 }

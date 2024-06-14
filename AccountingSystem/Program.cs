@@ -17,6 +17,8 @@ builder.Services.AddScoped<SupplyService>();
 builder.Services.AddScoped<NotificationService>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddSingleton<CheckService>();
+builder.Services.AddSingleton<TrendPredictionService>();
+
 
 
 // Configure Auth0

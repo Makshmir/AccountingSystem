@@ -1,64 +1,55 @@
 ﻿@model AccountingSystem.Models.Item
 
-
 @{
     ViewData["Title"] = "Details";
 }
 
-<h1>Цінник</h1>
+<h1 class="price-title">Цінник</h1>
+<hr />
+<dl class="price-details">
 
+    <div class="price-element">
+        <dt class="price-label">
+            <h5>@Html.DisplayNameFor(model => model.Name)</h5>
+        </dt>
+        <dd class="price-value">
+            <h4 class="price-name">@Html.DisplayFor(model => model.Name)</h4>
+        </dd>
+    </div>
 
-    <hr />
-    <dl class="price_row">
-
-        <div class="element_row">
-            <dt class="col-sm-2">
-                <h5>@Html.DisplayNameFor(model => model.Name)</h5>
-            </dt>
-            <dd class="col-sm-4">
-                <h4 class="h3_name">@Html.DisplayFor(model => model.Name)</h4>
-            </dd>
-        </div>
-
-
-    <div class="element_row">
-
-        <dd class="col-sm-10">
+    <div class="price-element">
+        <dd class="price-value">
             @{
                 if (Model.Discount != 0)
                 {
-                    <s>@Html.DisplayFor(model => model.Price) грн</s>
-
+                    <s class="original-price">@Html.DisplayFor(model => model.Price) грн</s>
                 }
-            
-                
             }
-            
-            
-            <h2>@Html.DisplayFor(model => model.DiscountedPrice)</h2>
-            <h4>грн</h4>
+            <h2 class="discounted-price">@Html.DisplayFor(model => model.DiscountedPrice) грн</h2>
         </dd>
     </div>
-        
-        @{
-            IronBarCode.GeneratedBarcode myBarcode = IronBarCode.BarcodeWriter.CreateBarcode(Model.Barcode, IronBarCode.BarcodeEncoding.Code128);
-            myBarcode.ResizeTo(350, 60);
-            myBarcode.SetMargins(5, 5, 5, 5);
-            string DataURL = myBarcode.ToDataUrl();
+    @{
+        IronBarCode.GeneratedBarcode myBarcode = IronBarCode.BarcodeWriter.CreateBarcode(Model.Barcode, IronBarCode.BarcodeEncoding.Code128);
+        myBarcode.ResizeTo(350, 60);
+        myBarcode.SetMargins(5, 5, 5, 5);
+        string DataURL = myBarcode.ToDataUrl();
+    }
+    <img src="@DataURL" class="barcode-image" />
+    <br />
+    <img src="/images/print.png" class="print-icon" />
+</dl>
 
-
-        }
-        @{
-
-        }
-        <img src="@DataURL" />
-        <br />
-        <img src="/images/print.png" width="32px" height="32px">
-
-
-    </dl>
+<div class="action-links">
+    @Html.ActionLink("Редагувати", "Edit", new { id = Model.Id }, new { @class = "btn btn-primary" }) |
+    <a asp-action="Index" class="btn btn-secondary">Повернутись</a>
 </div>
-<div>
-    @Html.ActionLink("Edit", "Edit", new { id = Model.Id }) |
-    <a asp-action="Index">Повернутись</a>
-</div>
+<script type="text/javascript">
+    document.addEventListener('DOMContentLoaded', function () {
+        var printIcon = document.querySelector('.print-icon');
+        printIcon.addEventListener('click', function () {
+            var itemId = '@Model.Id';
+            window.location.href = '/Items/GeneratePdf?id=' + itemId;
+        });
+    });
+</script>
+
